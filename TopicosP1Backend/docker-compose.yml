@@ -1,0 +1,6 @@
+﻿services: 
+
+  topicosp1backend:
+    image: topicosp1backend:latest
+    ports: 
+      - "32002:8080"
