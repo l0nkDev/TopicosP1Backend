@@ -38,14 +38,14 @@ namespace TopicosP1Backend.Controllers
                 return NotFound();
             }
 
-            List<SpSubject> spSubjects = await _context.SpSubjects.Include(l => l.StudyPlan).Include(m => m.Subject).Include(n => n.Subject.Prerequisites).Where(_ => _.StudyPlan == studyPlan).ToListAsync();
+            List<SpSubject> spSubjects = await _context.SpSubjects.Include(l => l.StudyPlan).Include(m => m.Subject).Where(_ => _.StudyPlan == studyPlan).ToListAsync();
             List<SubjectDTO> subjects = [];
             foreach (var spSubject in spSubjects) 
             {
                 List<SubjectDTO2> prerequisites = [];
-                foreach (var prereq in spSubject.Subject.Prerequisites)
+                foreach (var prereq in _context.Prerequisites.Include(l => l.Prerequisite).Where(_ => _.Postrequisite == spSubject.Subject))
                 {
-                    prerequisites.Add(new SubjectDTO2 { Code = prereq.Code, Title = prereq.Title });
+                    prerequisites.Add(new SubjectDTO2 { Code = prereq.Prerequisite.Code, Title = prereq.Prerequisite.Title });
                 }
                 subjects.Add(new SubjectDTO { Code = spSubject.Subject.Code, Title = spSubject.Subject.Title, Prerequisites = prerequisites });
             };

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
