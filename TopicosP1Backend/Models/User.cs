@@ -2,9 +2,12 @@
 
 namespace CareerApi.Models
 {
-    public class User: IdentityUser
+    public class User
     {
-        required public string FirstName { get; set; }
-        required public string LastName { get; set; }
+        public long Id { get; set; }
+        required public string Login { get; set; }
+        required public string Token { get; set; }
+        required public int PasswordHash { get; set; }
+        required public char Role { get; set; } //S: Estudiante, T: Docente, A: Administrativo, C: CPD
     }
 }

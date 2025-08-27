@@ -11,9 +11,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CareerContext>(opt =>
-    opt.UseInMemoryDatabase("main"));
+//    opt.UseInMemoryDatabase("main"));
+    opt.UseSqlite("Data Source=test.db"));
 builder.Services.AddDbContext<StudyPlanContext>(opt =>
-    opt.UseInMemoryDatabase("main"));
+//    opt.UseInMemoryDatabase("main"));
+    opt.UseSqlite("Data Source=test.db"));
+builder.Services.AddDbContext<UserContext>(opt =>
+//    opt.UseInMemoryDatabase("main"));
+    opt.UseSqlite("Data Source=test.db"));
+builder.Services.AddDbContext<SubjectContext>(opt =>
+//    opt.UseInMemoryDatabase("main"));
+    opt.UseSqlite("Data Source=test.db"));
 
 var app = builder.Build();
 

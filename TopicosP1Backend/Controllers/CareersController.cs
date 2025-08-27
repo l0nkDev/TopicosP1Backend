@@ -106,12 +106,5 @@ namespace TopicosP1Backend.Controllers
             return _context.Careers.Any(e => e.Id == id);
         }
 
-        private static CareerDTO CareerToDTO(Career career) =>
-            new CareerDTO
-            {
-                Id = career.Id,
-                Name = career.Name
-            };
-
     }
 }

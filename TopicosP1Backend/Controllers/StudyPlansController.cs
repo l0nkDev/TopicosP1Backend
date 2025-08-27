@@ -22,9 +22,15 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/StudyPlans
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StudyPlan>>> GetStudyPlans()
+        public async Task<ActionResult<IEnumerable<StudyPlanDTO>>> GetStudyPlans()
         {
-            return await _context.StudyPlans.Include(b => b.Career).ToListAsync();
+            List<StudyPlanDTO> studyplans = [];
+            var list = await _context.StudyPlans.ToListAsync();
+            foreach (var sp in list)
+            {
+                studyplans.Add(GetStudyPlan(sp.Code).Result.Value);
+            }
+            return studyplans;
         }
 
         // GET: api/StudyPlans/5

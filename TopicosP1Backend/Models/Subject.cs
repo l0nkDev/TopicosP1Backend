@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace CareerApi.Models
 {
@@ -7,5 +8,7 @@ namespace CareerApi.Models
         [Key]
         required public string Code { get; set; }
         required public string Title { get; set; }
+        public IEnumerable<SpSubject> SpSubjects { get; set; } = new List<SpSubject>();
+        public IEnumerable<StudyPlan> StudyPlans{ get; set; } = new List<StudyPlan>();
     }
 }
