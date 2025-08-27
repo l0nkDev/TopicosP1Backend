@@ -4,7 +4,7 @@ namespace TopicosP1Backend.Scripts
 {
     public class DatabaseInitialization
     {
-        public static void Populate(CareerContext context) 
+        public static void Populate(Context context) 
         {
             if (context.Careers.Any())
                 return;
@@ -106,7 +106,7 @@ namespace TopicosP1Backend.Scripts
             context.Subjects.AddRange(subjects);
             context.SaveChanges();
 
-            var prerequisites = new List<Prerequisites>()
+            var prerequisites = new List<SubjectDependency>()
             {
                 // SEM 1
                 // INF, SIS; RDS

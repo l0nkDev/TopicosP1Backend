@@ -1,6 +1,6 @@
 ﻿namespace CareerApi.Models
 {
-    public class Prerequisites
+    public class SubjectDependency
     {
         public long Id { get; set; }
         required public Subject Prerequisite { get; set; } 

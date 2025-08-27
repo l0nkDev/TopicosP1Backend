@@ -13,9 +13,9 @@ namespace TopicosP1Backend.Controllers
     [ApiController]
     public class CareersController : ControllerBase
     {
-        private readonly CareerContext _context;
+        private readonly Context _context;
 
-        public CareersController(CareerContext context)
+        public CareersController(Context context)
         {
             _context = context;
         }

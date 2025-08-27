@@ -13,23 +13,19 @@ namespace TopicosP1Backend.Controllers
     [ApiController]
     public class StudyPlansController : ControllerBase
     {
-        private readonly CareerContext _context;
+        private readonly Context _context;
 
-        public StudyPlansController(CareerContext context)
+        public StudyPlansController(Context context)
         {
             _context = context;
         }
 
         // GET: api/StudyPlans
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StudyPlanDTO>>> GetStudyPlans()
+        public async Task<IEnumerable<StudyPlanDTO>> GetStudyPlans()
         {
-            List<StudyPlanDTO> studyplans = [];
-            var list = await _context.StudyPlans.ToListAsync();
-            foreach (var sp in list)
-            {
-                studyplans.Add(GetStudyPlan(sp.Code).Result.Value);
-            }
+            var db = await _context.StudyPlans.ToListAsync();
+            var studyplans = from sp in db select GetStudyPlan(sp.Code).Result.Value;
             return studyplans;
         }
 
@@ -37,25 +33,9 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<StudyPlanDTO>> GetStudyPlan(string id)
         {
-            var studyPlan = await _context.StudyPlans.Include(_ => _.Career).FirstOrDefaultAsync(i => i.Code == id);
-
-            if (studyPlan == null)
-            {
-                return NotFound();
-            }
-
-            List<SpSubject> spSubjects = await _context.SpSubjects.Include(l => l.StudyPlan).Include(m => m.Subject).Where(_ => _.StudyPlan == studyPlan).ToListAsync();
-            List<SubjectDTO> subjects = [];
-            foreach (var spSubject in spSubjects) 
-            {
-                List<SubjectDTO2> prerequisites = [];
-                foreach (var prereq in _context.Prerequisites.Include(l => l.Prerequisite).Where(_ => _.Postrequisite == spSubject.Subject))
-                {
-                    prerequisites.Add(new SubjectDTO2 { Code = prereq.Prerequisite.Code, Title = prereq.Prerequisite.Title });
-                }
-                subjects.Add(new SubjectDTO { Code = spSubject.Subject.Code, Title = spSubject.Subject.Title, Prerequisites = prerequisites });
-            };
-            return new StudyPlanDTO { Code = studyPlan.Code, Career = studyPlan.Career.Name, Subjects = subjects };
+            var studyPlan = await _context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
+            if (studyPlan == null) return NotFound();
+            return new StudyPlanDTO(studyPlan);
         }
 
         // PUT: api/StudyPlans/5
@@ -63,11 +43,7 @@ namespace TopicosP1Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudyPlan(string id, StudyPlan studyPlan)
         {
-            if (id != studyPlan.Code)
-            {
-                return BadRequest();
-            }
-
+            if (id != studyPlan.Code){ return BadRequest(); }
             _context.Entry(studyPlan).State = EntityState.Modified;
 
             try

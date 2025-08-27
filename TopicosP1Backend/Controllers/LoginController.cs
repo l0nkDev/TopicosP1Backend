@@ -14,9 +14,9 @@ namespace TopicosP1Backend.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly UserContext _context;
+        private readonly Context _context;
 
-        public LoginController(UserContext context)
+        public LoginController(Context context)
         {
             _context = context;
         }
