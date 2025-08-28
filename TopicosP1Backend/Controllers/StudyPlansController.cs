@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
+using TopicosP1Backend.Scripts;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -14,10 +15,12 @@ namespace TopicosP1Backend.Controllers
     public class StudyPlansController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public StudyPlansController(Context context)
+        public StudyPlansController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         // GET: api/StudyPlans
@@ -33,9 +36,26 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<StudyPlanDTO>> GetStudyPlan(string id)
         {
+            Console.WriteLine("GET EJECUTANDO");
             var studyPlan = await _context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return NotFound();
-            return new StudyPlanDTO(studyPlan);
+            StudyPlanDTO res = new(studyPlan);
+            return res;
+        }
+
+        // GET: api/StudyPlans/5
+        [HttpGet("async/{id}")]
+        public string GetStudyPlanAsync(string id)
+        {
+            _queue.Add(id, () => GetStudyPlan(id));
+            return id;
+        }
+
+        // GET: api/StudyPlans/5
+        [HttpGet("async/get/{id}")]
+        public async Task<ActionResult<StudyPlanDTO>> GetStudyPlanStatusAsync(string id)
+        {
+            return (StudyPlanDTO)_queue.Get(id);
         }
 
         // PUT: api/StudyPlans/5

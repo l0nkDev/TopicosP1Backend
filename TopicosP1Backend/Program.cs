@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using TopicosP1Backend.Scripts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Context>(opt =>
-//    opt.UseInMemoryDatabase("main"));
-    opt.UseSqlite("Data Source=test.db"));
+    opt.UseInMemoryDatabase("main"));
+//    opt.UseSqlite("Data Source=test.db"));
+builder.Services.AddSingleton<APIQueue>();
 
 var app = builder.Build();
 

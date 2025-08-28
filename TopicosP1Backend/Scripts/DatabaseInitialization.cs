@@ -1,4 +1,7 @@
 ﻿using CareerApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TopicosP1Backend.Controllers;
 
 namespace TopicosP1Backend.Scripts
 {
@@ -24,7 +27,6 @@ namespace TopicosP1Backend.Scripts
                 new() { Name = "INGENIERIA EN ROBOTICA"},
             };
             context.Careers.AddRange(careers);
-            context.SaveChanges();
 
             var studyplans = new List<StudyPlan>
             {
@@ -35,7 +37,6 @@ namespace TopicosP1Backend.Scripts
                 new() { Code = "187-6", Career = careers[0] }, //INF(New)
             };
             context.StudyPlans.AddRange(studyplans);
-            context.SaveChanges();
 
             var subjects = new List<Subject>
             {
@@ -152,8 +153,6 @@ namespace TopicosP1Backend.Scripts
                 new() { Code = "ELC208", Title = "REDES AD HOC" },                            //95
             };
             context.Subjects.AddRange(subjects);
-            context.SaveChanges();
-
 
             var prerequisites = new List<SubjectDependency>()
             {
@@ -415,9 +414,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Prerequisite = subjects[65], Postrequisite = subjects[71], StudyPlan = studyplans[2] },
 
             };
-
             context.SubjectDependencies.AddRange(prerequisites);
-            context.SaveChanges();
 
             var spsubjects = new List<SpSubject>()
             {
@@ -533,6 +530,43 @@ namespace TopicosP1Backend.Scripts
     {
         static public int Hash(String s) { return s.Select(a => (int)a).Sum(); }
         static public string GenToken() { return string.Join("", Enumerable.Repeat(0, 100).Select(n => (char)new Random().Next(32, 127))).Replace("/", "").Replace(" ", "").Replace("\\", "").Replace("\"", "").Replace("'", ""); }
+    }
+
+    public class Transaction
+    {
+        required public string Id { get; set; }
+        required public Action Action { get; set; }
+    }
+
+    public class APIQueue
+    {
+        Thread? Thread = null;
+        Queue<Transaction> q = [];
+        Dictionary<string, object> responses = [];
+
+        public APIQueue() 
+        {
+            Thread = new(BackgroundProcess);
+            Thread.Start();
+        }
+        
+        public void BackgroundProcess()
+        {
+            while (true)
+            {
+                if (q.Count() != 0) 
+                {
+                    Transaction i = q.Dequeue();
+                    Action a = i.Action;
+                    a();
+                }
+                Thread.Sleep(1000);
+            }
+        }
+
+        public void Add(string id, Action action) => q.Enqueue(new Transaction() { Id = id, Action = action });
+        public void AddResponse(string id, object obj) => responses.Add(id, obj);
+        public object Get(string id) { object obj = responses[id]; responses.Remove(id); return obj; }
     }
 
 }
