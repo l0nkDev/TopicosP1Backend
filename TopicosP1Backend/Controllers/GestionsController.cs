@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class GestionsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public GestionsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Gestions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Gestion>>> GetGestions()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Gestions.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Gestions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Gestion>> GetGestion(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var gestion = await _context.Gestions.FindAsync(id);
 
-            if (career == null)
+            if (gestion == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return gestion;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Gestions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutGestion(long id, Gestion gestion)
         {
-            if (id != career.Id)
+            if (id != gestion.Year)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(gestion).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!GestionExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Gestions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Gestion>> PostGestion(Gestion gestion)
         {
-            _context.Careers.Add(career);
+            _context.Gestions.Add(gestion);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetGestion", new { id = gestion.Year }, gestion);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Gestions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteGestion(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var gestion = await _context.Gestions.FindAsync(id);
+            if (gestion == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Gestions.Remove(gestion);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool GestionExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Gestions.Any(e => e.Year == id);
         }
-
     }
 }

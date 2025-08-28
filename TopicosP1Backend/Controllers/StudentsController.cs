@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class StudentsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public StudentsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Students
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Students.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Students/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Student>> GetStudent(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var student = await _context.Students.FindAsync(id);
 
-            if (career == null)
+            if (student == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return student;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Students/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutStudent(long id, Student student)
         {
-            if (id != career.Id)
+            if (id != student.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(student).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!StudentExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Students
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Student>> PostStudent(Student student)
         {
-            _context.Careers.Add(career);
+            _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetStudent", new { id = student.Id }, student);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Students/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteStudent(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Students.Remove(student);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool StudentExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Students.Any(e => e.Id == id);
         }
-
     }
 }

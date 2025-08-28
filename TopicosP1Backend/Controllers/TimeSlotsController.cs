@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class TimeSlotsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public TimeSlotsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/TimeSlots
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<TimeSlot>>> GetTimeSlots()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.TimeSlots.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/TimeSlots/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<TimeSlot>> GetTimeSlot(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var timeSlot = await _context.TimeSlots.FindAsync(id);
 
-            if (career == null)
+            if (timeSlot == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return timeSlot;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/TimeSlots/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutTimeSlot(long id, TimeSlot timeSlot)
         {
-            if (id != career.Id)
+            if (id != timeSlot.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(timeSlot).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!TimeSlotExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/TimeSlots
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<TimeSlot>> PostTimeSlot(TimeSlot timeSlot)
         {
-            _context.Careers.Add(career);
+            _context.TimeSlots.Add(timeSlot);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetTimeSlot", new { id = timeSlot.Id }, timeSlot);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/TimeSlots/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteTimeSlot(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var timeSlot = await _context.TimeSlots.FindAsync(id);
+            if (timeSlot == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.TimeSlots.Remove(timeSlot);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool TimeSlotExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.TimeSlots.Any(e => e.Id == id);
         }
-
     }
 }

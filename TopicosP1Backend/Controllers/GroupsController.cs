@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class GroupsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public GroupsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Groups.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Group>> GetGroup(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var @group = await _context.Groups.FindAsync(id);
 
-            if (career == null)
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return @group;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Groups/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutGroup(long id, Group @group)
         {
-            if (id != career.Id)
+            if (id != @group.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(@group).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!GroupExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Group>> PostGroup(Group @group)
         {
-            _context.Careers.Add(career);
+            _context.Groups.Add(@group);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Groups/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteGroup(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var @group = await _context.Groups.FindAsync(id);
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Groups.Remove(@group);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool GroupExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Groups.Any(e => e.Id == id);
         }
-
     }
 }

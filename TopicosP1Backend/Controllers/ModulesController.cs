@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class ModulesController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public ModulesController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Modules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Module>>> GetModules()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Modules.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Modules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Module>> GetModule(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var @module = await _context.Modules.FindAsync(id);
 
-            if (career == null)
+            if (@module == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return @module;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Modules/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutModule(long id, Module @module)
         {
-            if (id != career.Id)
+            if (id != @module.Number)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(@module).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!ModuleExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Modules
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Module>> PostModule(Module @module)
         {
-            _context.Careers.Add(career);
+            _context.Modules.Add(@module);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetModule", new { id = @module.Number }, @module);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Modules/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteModule(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var @module = await _context.Modules.FindAsync(id);
+            if (@module == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Modules.Remove(@module);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool ModuleExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Modules.Any(e => e.Number == id);
         }
-
     }
 }

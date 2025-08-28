@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class PeriodsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public PeriodsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Periods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Period>>> GetPeriods()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Periods.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Periods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Period>> GetPeriod(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var period = await _context.Periods.FindAsync(id);
 
-            if (career == null)
+            if (period == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return period;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Periods/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutPeriod(long id, Period period)
         {
-            if (id != career.Id)
+            if (id != period.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(period).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!PeriodExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Periods
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Period>> PostPeriod(Period period)
         {
-            _context.Careers.Add(career);
+            _context.Periods.Add(period);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetPeriod", new { id = period.Id }, period);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Periods/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeletePeriod(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var period = await _context.Periods.FindAsync(id);
+            if (period == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Periods.Remove(period);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool PeriodExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Periods.Any(e => e.Id == id);
         }
-
     }
 }

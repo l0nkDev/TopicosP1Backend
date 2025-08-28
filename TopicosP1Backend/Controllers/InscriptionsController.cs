@@ -11,48 +11,47 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CareersController : ControllerBase
+    public class InscriptionsController : ControllerBase
     {
         private readonly Context _context;
 
-        public CareersController(Context context)
+        public InscriptionsController(Context context)
         {
             _context = context;
         }
 
-        // GET: api/Careers
+        // GET: api/Inscriptions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<ActionResult<IEnumerable<Inscription>>> GetInscriptions()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            return await _context.Inscriptions.ToListAsync();
         }
 
-        // GET: api/Careers/5
+        // GET: api/Inscriptions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Career>> GetCareer(long id)
+        public async Task<ActionResult<Inscription>> GetInscription(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var inscription = await _context.Inscriptions.FindAsync(id);
 
-            if (career == null)
+            if (inscription == null)
             {
                 return NotFound();
             }
 
-            return career;
+            return inscription;
         }
 
-        // PUT: api/Careers/5
+        // PUT: api/Inscriptions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, Career career)
+        public async Task<IActionResult> PutInscription(long id, Inscription inscription)
         {
-            if (id != career.Id)
+            if (id != inscription.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(career).State = EntityState.Modified;
+            _context.Entry(inscription).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +59,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CareerExists(id))
+                if (!InscriptionExists(id))
                 {
                     return NotFound();
                 }
@@ -73,38 +72,36 @@ namespace TopicosP1Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Careers
+        // POST: api/Inscriptions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(Career career)
+        public async Task<ActionResult<Inscription>> PostInscription(Inscription inscription)
         {
-            _context.Careers.Add(career);
+            _context.Inscriptions.Add(inscription);
             await _context.SaveChangesAsync();
 
-            //    return CreatedAtAction("GetCareer", new { id = career.Id }, career);
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            return CreatedAtAction("GetInscription", new { id = inscription.Id }, inscription);
         }
 
-        // DELETE: api/Careers/5
+        // DELETE: api/Inscriptions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public async Task<IActionResult> DeleteInscription(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null)
+            var inscription = await _context.Inscriptions.FindAsync(id);
+            if (inscription == null)
             {
                 return NotFound();
             }
 
-            _context.Careers.Remove(career);
+            _context.Inscriptions.Remove(inscription);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CareerExists(long id)
+        private bool InscriptionExists(long id)
         {
-            return _context.Careers.Any(e => e.Id == id);
+            return _context.Inscriptions.Any(e => e.Id == id);
         }
-
     }
 }
