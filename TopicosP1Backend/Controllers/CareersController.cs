@@ -22,10 +22,14 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Careers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Career>>> GetCareers()
+        public async Task<IEnumerable<CareerDTO>> GetCareers()
         {
-            Console.WriteLine("triggered!");
-            return await _context.Careers.ToListAsync();
+            var careers = await _context.Careers.Include(_ => _.StudyPlans)
+                .ThenInclude(_ => _.Subjects)
+                .ThenInclude(_ => _.Prerequisites)
+                .ToListAsync();
+            return from a in careers select new CareerDTO(a);
+
         }
 
         // GET: api/Careers/5
