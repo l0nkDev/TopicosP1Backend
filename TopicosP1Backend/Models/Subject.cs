@@ -22,22 +22,20 @@ namespace CareerApi.Models
         [Key]
         required public string Code { get; set; }
         required public string Title { get; set; }
+        required public int Credits { get; set; }
+        required public int Level { get; set; }
+        required public string Type { get; set; }
         public IEnumerable<SubjectDTO2> Prerequisites { get; set; } = new List<SubjectDTO2>();
 
         [SetsRequiredMembers]
-        public SubjectDTO(Subject subject)
+        public SubjectDTO(SpSubject spSubject)
         {
-            Code = subject.Code;
-            Title = subject.Title;
-            Prerequisites = from a in subject.Prerequisites select new SubjectDTO2(a);
-        }
-
-        [SetsRequiredMembers]
-        public SubjectDTO(Subject subject, StudyPlan studyPlan)
-        {
-            Code = subject.Code;
-            Title = subject.Title;
-            Prerequisites = from a in subject.PostDependencies where a.StudyPlan == studyPlan select new SubjectDTO2(a.Prerequisite);
+            Code = spSubject.Subject.Code;
+            Title = spSubject.Subject.Title;
+            Credits = spSubject.Credits;
+            Level = spSubject.Level;
+            Type = spSubject.Type switch { 0 => "Exclusive", 1 => "Shared", 2 => "Optative", 3 => "Elective", 4 => "Degree", _ => "Undefined" };
+            Prerequisites = from a in spSubject.Subject.PreDependencies where a.StudyPlan == spSubject.StudyPlan select new SubjectDTO2(a.Prerequisite);
         }
     }
    

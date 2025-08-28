@@ -13,10 +13,19 @@ namespace CareerApi.Models
         }
 
         public DbSet<Career> Careers { get; set; } = default!;
+        public DbSet<Gestion> Gestions { get; set; } = default!;
+        public DbSet<Group> Groups { get; set; } = default!;
+        public DbSet<GroupInscription> GroupInscriptions { get; set; } = default!;
+        public DbSet<Inscription> Inscriptions { get; set; } = default!;
+        public DbSet<Module> Modules { get; set; } = default!;
+        public DbSet<Period> Periods { get; set; } = default!;
+        public DbSet<Room> Rooms { get; set; } = default!;
+        public DbSet<SpSubject> SpSubjects { get; set; } = default!;
+        public DbSet<Student> Students { get; set; } = default!;
         public DbSet<StudyPlan> StudyPlans { get; set; } = default!;
         public DbSet<Subject> Subjects { get; set; } = default!;
-        public DbSet<SpSubject> SpSubjects { get; set; } = default!;
-        public DbSet<SubjectDependency> Prerequisites { get; set; } = default!;
+        public DbSet<SubjectDependency> SubjectDependencies { get; set; } = default!;
+        public DbSet<TimeSlot> TimeSlots { get; set; } = default!;
         public DbSet<User> Users { get; set; } = default!;
         public char GetRequestUserRole(HttpRequest request)
         {
@@ -42,8 +51,8 @@ namespace CareerApi.Models
                 .HasMany(e => e.Prerequisites)
                 .WithMany(e => e.Postrequisites)
                 .UsingEntity<SubjectDependency>(
-                    r => r.HasOne<Subject>(e => e.Prerequisite).WithMany(e => e.PreDependencies),
-                    s => s.HasOne<Subject>(e => e.Postrequisite).WithMany(e => e.PostDependencies)
+                    r => r.HasOne(e => e.Prerequisite).WithMany(e => e.PostDependencies),
+                    s => s.HasOne(e => e.Postrequisite).WithMany(e => e.PreDependencies)
                 );
         }
     }

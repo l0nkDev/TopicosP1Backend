@@ -416,7 +416,7 @@ namespace TopicosP1Backend.Scripts
 
             };
 
-            context.Prerequisites.AddRange(prerequisites);
+            context.SubjectDependencies.AddRange(prerequisites);
             context.SaveChanges();
 
             var spsubjects = new List<SpSubject>()
@@ -523,7 +523,6 @@ namespace TopicosP1Backend.Scripts
                 new() { StudyPlan = studyplans[0], Subject = subjects[69], Credits = 5, Level = 7, Type = 4},
                 new() { StudyPlan = studyplans[0], Subject = subjects[70], Credits = 5, Level = 10, Type = 4},
                 new() { StudyPlan = studyplans[0], Subject = subjects[71], Credits = 4, Level = 10, Type = 4},
-
             };
             context.SpSubjects.AddRange(spsubjects);
             context.SaveChanges();

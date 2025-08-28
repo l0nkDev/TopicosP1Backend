@@ -23,7 +23,7 @@ namespace CareerApi.Models
         {
             Code = studyPlan.Code;
             Career = studyPlan.Career.Name;
-            Subjects = from a in studyPlan.Subjects select new SubjectDTO(a, studyPlan);
+            Subjects = from a in studyPlan.SpSubjects select new SubjectDTO(a);
         }
     }
 }
