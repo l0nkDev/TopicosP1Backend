@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CareerApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using TopicosP1Backend.Scripts;
 
-namespace CareerApi.Models
+namespace TopicosP1Backend.Scripts
 {
     public class Context: DbContext
     {
@@ -46,6 +46,16 @@ namespace CareerApi.Models
                 .HasMany(e => e.Subjects)
                 .WithMany(e => e.StudyPlans)
                 .UsingEntity<SpSubject>();
+
+            modelBuilder.Entity<Group>()
+                .HasMany(e => e.Inscriptions)
+                .WithMany(e => e.Groups)
+                .UsingEntity<GroupInscription>();
+
+            modelBuilder.Entity<Inscription>()
+                .HasMany(e => e.Groups)
+                .WithMany(e => e.Inscriptions)
+                .UsingEntity<GroupInscription>();
 
             modelBuilder.Entity<Subject>()
                 .HasMany(e => e.Prerequisites)

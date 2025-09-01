@@ -537,54 +537,54 @@ namespace TopicosP1Backend.Scripts
 
             var periods = new List<Period>()
             {
-                new() { Number = 1, Gestion = gestions[0]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[0]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[0]}, //Verano
-                new() { Number = 4, Gestion = gestions[0]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[0]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[0]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[0]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[0]}, //Mesa extraordinaria verano
-                new() { Number = 1, Gestion = gestions[1]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[1]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[1]}, //Verano
-                new() { Number = 4, Gestion = gestions[1]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[1]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[1]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[1]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[1]}, //Mesa extraordinaria verano
-                new() { Number = 1, Gestion = gestions[2]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[2]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[2]}, //Verano
-                new() { Number = 4, Gestion = gestions[2]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[2]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[2]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[2]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[2]}, //Mesa extraordinaria verano
-                new() { Number = 1, Gestion = gestions[3]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[3]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[3]}, //Verano
-                new() { Number = 4, Gestion = gestions[3]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[3]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[3]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[3]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[3]}, //Mesa extraordinaria verano
-                new() { Number = 1, Gestion = gestions[4]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[4]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[4]}, //Verano
-                new() { Number = 4, Gestion = gestions[4]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[4]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[4]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[4]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[4]}, //Mesa extraordinaria verano
-                new() { Number = 1, Gestion = gestions[5]}, //1er semestre
-                new() { Number = 2, Gestion = gestions[5]}, //2do semestre
-                new() { Number = 3, Gestion = gestions[5]}, //Verano
-                new() { Number = 4, Gestion = gestions[5]}, //Mesa del 1er Semestre
-                new() { Number = 5, Gestion = gestions[5]}, //Mesa del 2do Semestre
-                new() { Number = 6, Gestion = gestions[5]}, //Mesa extraordinaria 1er semestre
-                new() { Number = 7, Gestion = gestions[5]}, //Mesa extraordianria 2do semestre
-                new() { Number = 8, Gestion = gestions[5]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[0]}, //1. 1er semestre
+                new() { Number = 2, Gestion = gestions[0]}, //2. 2do semestre
+                new() { Number = 3, Gestion = gestions[0]}, //3. Verano
+                new() { Number = 4, Gestion = gestions[0]}, //4. Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[0]}, //5. Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[0]}, //6. Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[0]}, //7. Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[0]}, //8. Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[1]}, //9. 1er semestre
+                new() { Number = 2, Gestion = gestions[1]}, //10 2do semestre
+                new() { Number = 3, Gestion = gestions[1]}, //11 Verano
+                new() { Number = 4, Gestion = gestions[1]}, //12 Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[1]}, //13 Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[1]}, //14 Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[1]}, //15 Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[1]}, //16 Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[2]}, //17 1er semestre
+                new() { Number = 2, Gestion = gestions[2]}, //18 2do semestre
+                new() { Number = 3, Gestion = gestions[2]}, //19 Verano
+                new() { Number = 4, Gestion = gestions[2]}, //20 Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[2]}, //21 Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[2]}, //22 Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[2]}, //23 Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[2]}, //24 Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[3]}, //25 1er semestre
+                new() { Number = 2, Gestion = gestions[3]}, //26 2do semestre
+                new() { Number = 3, Gestion = gestions[3]}, //27 Verano
+                new() { Number = 4, Gestion = gestions[3]}, //28 Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[3]}, //29 Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[3]}, //30 Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[3]}, //31 Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[3]}, //32 Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[4]}, //33 1er semestre
+                new() { Number = 2, Gestion = gestions[4]}, //34 2do semestre
+                new() { Number = 3, Gestion = gestions[4]}, //35 Verano
+                new() { Number = 4, Gestion = gestions[4]}, //36 Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[4]}, //37 Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[4]}, //38 Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[4]}, //39 Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[4]}, //40 Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[5]}, //41 1er semestre
+                new() { Number = 2, Gestion = gestions[5]}, //42 2do semestre
+                new() { Number = 3, Gestion = gestions[5]}, //43 Verano
+                new() { Number = 4, Gestion = gestions[5]}, //44 Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[5]}, //45 Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[5]}, //46 Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[5]}, //47 Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[5]}, //48 Mesa extraordinaria verano
             };
             context.Periods.AddRange(periods);
 
@@ -596,35 +596,35 @@ namespace TopicosP1Backend.Scripts
 
             var rooms = new List<Room>()
             {
-                new() { Module = modules[0], Number = 11},
-                new() { Module = modules[0], Number = 12},
-                new() { Module = modules[0], Number = 13},
-                new() { Module = modules[0], Number = 14},
-                new() { Module = modules[0], Number = 15},
-                new() { Module = modules[0], Number = 16},
-                new() { Module = modules[0], Number = 17},
-                new() { Module = modules[0], Number = 21},
-                new() { Module = modules[0], Number = 22},
-                new() { Module = modules[0], Number = 23},
-                new() { Module = modules[0], Number = 24},
-                new() { Module = modules[0], Number = 25},
-                new() { Module = modules[0], Number = 26},
-                new() { Module = modules[0], Number = 27},
-                new() { Module = modules[0], Number = 31},
-                new() { Module = modules[0], Number = 32},
-                new() { Module = modules[0], Number = 33},
-                new() { Module = modules[0], Number = 34},
-                new() { Module = modules[0], Number = 35},
-                new() { Module = modules[0], Number = 36},
-                new() { Module = modules[0], Number = 37},
-                new() { Module = modules[0], Number = 38},
-                new() { Module = modules[0], Number = 40},
-                new() { Module = modules[0], Number = 41},
-                new() { Module = modules[0], Number = 42},
-                new() { Module = modules[0], Number = 43},
-                new() { Module = modules[0], Number = 44},
-                new() { Module = modules[0], Number = 45},
-                new() { Module = modules[0], Number = 46},
+                new() { Module = modules[0], Number = 11},//0
+                new() { Module = modules[0], Number = 12},//1
+                new() { Module = modules[0], Number = 13},//2
+                new() { Module = modules[0], Number = 14},//3
+                new() { Module = modules[0], Number = 15},//4
+                new() { Module = modules[0], Number = 16},//5
+                new() { Module = modules[0], Number = 17},//6
+                new() { Module = modules[0], Number = 21},//7
+                new() { Module = modules[0], Number = 22},//8
+                new() { Module = modules[0], Number = 23},//9
+                new() { Module = modules[0], Number = 24},//10
+                new() { Module = modules[0], Number = 25},//11
+                new() { Module = modules[0], Number = 26},//12
+                new() { Module = modules[0], Number = 27},//13
+                new() { Module = modules[0], Number = 31},//14
+                new() { Module = modules[0], Number = 32},//15
+                new() { Module = modules[0], Number = 33},//16
+                new() { Module = modules[0], Number = 34},//17
+                new() { Module = modules[0], Number = 35},//18
+                new() { Module = modules[0], Number = 36},//19
+                new() { Module = modules[0], Number = 37},//20
+                new() { Module = modules[0], Number = 38},//21
+                new() { Module = modules[0], Number = 40},//22
+                new() { Module = modules[0], Number = 41},//23
+                new() { Module = modules[0], Number = 42},//24
+                new() { Module = modules[0], Number = 43},//25
+                new() { Module = modules[0], Number = 44},//26
+                new() { Module = modules[0], Number = 45},//27
+                new() { Module = modules[0], Number = 46},//28
             };
             context.Rooms.AddRange(rooms);
 
@@ -634,36 +634,51 @@ namespace TopicosP1Backend.Scripts
                 new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
             };
             context.Students.AddRange(students);
+            students[0].StudyPlans.Append(studyplans[0]);
+            students[1].StudyPlans.Append(studyplans[0]);
 
             var inscriptions = new List<Inscription>()
             {
-                new() { Student = students [1], Period = periods[16], Type = 0}, //1-2022 (2*8+1-1)
-                new() { Student = students [1], Period = periods[17], Type = 0}, //2-2022  (2*8+2-1)
-                new() { Student = students [1], Period = periods[24], Type = 0}, //1-2023  (3*8+1-1)
-                new() { Student = students [1], Period = periods[25], Type = 0}, //2-2023
-                new() { Student = students [1], Period = periods[32], Type = 0}, //1-2024
-                new() { Student = students [1], Period = periods[33], Type = 0}, //2-2024
-                new() { Student = students [1], Period = periods[33], Type = 2}, 
-                new() { Student = students [1], Period = periods[40], Type = 0},
-                new() { Student = students [1], Period = periods[40], Type = 1},
-                new() { Student = students [1], Period = periods[40], Type = 2},
-                new() { Student = students [1], Period = periods[41], Type = 0},
-                new() { Student = students [1], Period = periods[41], Type = 1},
-                new() { Student = students [1], Period = periods[41], Type = 2},
+                new() { Student = students[1], Period = periods[16], Type = 0}, //1-2022 (2*8+1-1)
+                new() { Student = students[1], Period = periods[17], Type = 0}, //2-2022  (2*8+2-1)
+                new() { Student = students[1], Period = periods[24], Type = 0}, //1-2023  (3*8+1-1)
+                new() { Student = students[1], Period = periods[25], Type = 0}, //2-2023
+                new() { Student = students[1], Period = periods[32], Type = 0}, //1-2024
+                new() { Student = students[1], Period = periods[33], Type = 0}, //2-2024
+                new() { Student = students[1], Period = periods[33], Type = 2}, 
+                new() { Student = students[1], Period = periods[40], Type = 0},
+                new() { Student = students[1], Period = periods[40], Type = 1},
+                new() { Student = students[1], Period = periods[40], Type = 2},
+                new() { Student = students[1], Period = periods[41], Type = 0},
+                new() { Student = students[1], Period = periods[41], Type = 1},
+                new() { Student = students[1], Period = periods[41], Type = 2},
+                new() { Student = students[1], Period = periods[41], Type = 2},
+                new() { Student = students[0], Period = periods[41], Type = 0},
             };
             context.Inscriptions.AddRange(inscriptions);
 
-            var groupinscriptions = new List<GroupInscription>
-            {
-                
-            };
-
-
             var timeslots = new List<TimeSlot>()
             {
-
+                new() { Day = "Tuesday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41]},
+                new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41]},
+                new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[17], Period = periods[41]},
+                new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[25], Period = periods[41]},
             };
             context.TimeSlots.AddRange(timeslots);
+
+            var groups = new List<Group>()
+            {
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[78]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[74]},
+            };
+            context.Groups.AddRange(groups);
+
+            var groupinscriptions = new List<GroupInscription>
+            {
+                new() { Group = groups[0], Inscription = inscriptions[14]},
+                new() { Group = groups[1], Inscription = inscriptions[14]},
+            };
+            context.GroupInscriptions.AddRange(groupinscriptions);
 
 
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
+using TopicosP1Backend.Scripts;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -22,23 +23,24 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Gestions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gestion>>> GetGestions()
+        public async Task<IEnumerable<Gestion.GestionDTO>> GetGestions()
         {
-            return await _context.Gestions.ToListAsync();
+            var l = await _context.Gestions.Include(_ => _.Periods).ToListAsync();
+            return from a in l select a.Simple();
         }
 
         // GET: api/Gestions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gestion>> GetGestion(long id)
+        public async Task<ActionResult<Gestion.GestionDTO>> GetGestion(long id)
         {
-            var gestion = await _context.Gestions.FindAsync(id);
+            var gestion = await _context.Gestions.Include(_ => _.Periods).FirstOrDefaultAsync(_ => _.Year == id);
 
             if (gestion == null)
             {
                 return NotFound();
             }
 
-            return gestion;
+            return gestion.Simple();
         }
 
         // PUT: api/Gestions/5

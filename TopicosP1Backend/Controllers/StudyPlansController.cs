@@ -25,37 +25,22 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/StudyPlans
         [HttpGet]
-        public async Task<IEnumerable<StudyPlan.StudyPlanDTO>> GetStudyPlans()
+        public object GetStudyPlans()
         {
-            var db = await _context.StudyPlans.ToListAsync();
-            var studyplans = from sp in db select GetStudyPlan(sp.Code).Result.Value;
-            return studyplans;
-        }
-
-        // GET: api/StudyPlans/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlan(string id)
-        {
-            var studyPlan = await _context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
-            if (studyPlan == null) return NotFound();
-            StudyPlan.StudyPlanDTO res = new(studyPlan);
-            return res;
-        }
-
-        // GET: api/StudyPlans/5
-        [HttpGet("async/{id}")]
-        public string GetStudyPlanAsync(string id)
-        {
-            string tranid = id.GetHashCode().ToString();
-            _queue.Add(id, () => _queue.GetStudyPlan(id, tranid));
+            string tranid = "All studyplans".GetHashCode().ToString();
+            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            _queue.Add(tranid, () => _queue.GetStudyPlans(tranid));
             return tranid;
         }
 
         // GET: api/StudyPlans/5
-        [HttpGet("async/{id}")]
-        public StudyPlan.StudyPlanDTO GetStudyPlanStatus(string id)
+        [HttpGet("{id}")]
+        public object GetStudyPlanAsync(string id)
         {
-            return (StudyPlan.StudyPlanDTO)_queue.Get(id);
+            string tranid = id.GetHashCode().ToString();
+            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            _queue.Add(tranid, () => _queue.GetStudyPlan(id, tranid));
+            return tranid;
         }
 
         // PUT: api/StudyPlans/5

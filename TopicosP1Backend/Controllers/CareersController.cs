@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using static CareerApi.Models.Career;
+using TopicosP1Backend.Scripts;
 
 namespace TopicosP1Backend.Controllers
 {
