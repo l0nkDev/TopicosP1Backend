@@ -22,6 +22,7 @@ namespace TopicosP1Backend.Scripts
         public DbSet<Room> Rooms { get; set; } = default!;
         public DbSet<SpSubject> SpSubjects { get; set; } = default!;
         public DbSet<Student> Students { get; set; } = default!;
+        public DbSet<StudentStudyPlan> StudentStudyPlans { get; set; } = default!;
         public DbSet<StudyPlan> StudyPlans { get; set; } = default!;
         public DbSet<Subject> Subjects { get; set; } = default!;
         public DbSet<SubjectDependency> SubjectDependencies { get; set; } = default!;
@@ -56,6 +57,16 @@ namespace TopicosP1Backend.Scripts
                 .HasMany(e => e.Groups)
                 .WithMany(e => e.Inscriptions)
                 .UsingEntity<GroupInscription>();
+
+            modelBuilder.Entity<Student>()
+                .HasMany(e => e.StudyPlans)
+                .WithMany(e => e.Students)
+                .UsingEntity<StudentStudyPlan>();
+
+            modelBuilder.Entity<StudyPlan>()
+                .HasMany(e => e.Students)
+                .WithMany(e => e.StudyPlans)
+                .UsingEntity<StudentStudyPlan>();
 
             modelBuilder.Entity<Subject>()
                 .HasMany(e => e.Prerequisites)

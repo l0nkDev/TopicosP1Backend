@@ -11,6 +11,7 @@ namespace CareerApi.Models
         public Career Career { get; set; } = null!;
         public IEnumerable<SpSubject> SpSubjects { get; set; } = new List<SpSubject>();
         public IEnumerable<Subject> Subjects { get; set; } = new List<Subject>();
+        public IEnumerable<Student> Students { get; set; } = new List<Student>();
         public StudyPlanDTO Simple() => new(this);
 
         public class StudyPlanDTO(StudyPlan studyPlan)

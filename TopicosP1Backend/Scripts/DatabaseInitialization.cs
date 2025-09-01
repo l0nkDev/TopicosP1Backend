@@ -634,8 +634,13 @@ namespace TopicosP1Backend.Scripts
                 new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
             };
             context.Students.AddRange(students);
-            students[0].StudyPlans.Append(studyplans[0]);
-            students[1].StudyPlans.Append(studyplans[0]);
+
+            var studentsstudyplans = new List<StudentStudyPlan>()
+            {
+                new() {Student = students[0], StudyPlans = studyplans[0]},
+                new() {Student = students[1], StudyPlans = studyplans[0]},
+            };
+            context.StudentStudyPlans.AddRange(studentsstudyplans);
 
             var inscriptions = new List<Inscription>()
             {
@@ -679,8 +684,6 @@ namespace TopicosP1Backend.Scripts
                 new() { Group = groups[1], Inscription = inscriptions[14]},
             };
             context.GroupInscriptions.AddRange(groupinscriptions);
-
-
 
             context.SaveChanges();
         }
