@@ -540,33 +540,50 @@ namespace TopicosP1Backend.Scripts
 
     public class APIQueue
     {
-        Thread? Thread = null;
-        Queue<Transaction> q = [];
-        Dictionary<string, object> responses = [];
+        private readonly IServiceScopeFactory scopeFactory;
+        private Context? context;
+        private readonly Thread? Thread = null;
+        private Queue<Transaction> q = [];
+        private Dictionary<string, object> responses = [];
 
-        public APIQueue() 
+        public APIQueue(IServiceScopeFactory scopeFactory) 
         {
+            this.scopeFactory = scopeFactory;
             Thread = new(BackgroundProcess);
             Thread.Start();
         }
         
         public void BackgroundProcess()
         {
-            while (true)
+            IServiceScope? scope = null;
             {
-                if (q.Count() != 0) 
+                while (true)
                 {
-                    Transaction i = q.Dequeue();
-                    Action a = i.Action;
-                    a();
+                    if (q.Count() != 0)
+                    {
+                        if (scope == null)
+                        {
+                            scope = scopeFactory.CreateScope();
+                            context = scope.ServiceProvider.GetService<Context>();
+                        }
+                        Transaction i = q.Dequeue();
+                        Action a = i.Action;
+                        a();
+                    }
+                    else { scope?.Dispose(); scope = null; }
                 }
-                Thread.Sleep(1000);
             }
         }
-
         public void Add(string id, Action action) => q.Enqueue(new Transaction() { Id = id, Action = action });
         public void AddResponse(string id, object obj) => responses.Add(id, obj);
         public object Get(string id) { object obj = responses[id]; responses.Remove(id); return obj; }
+        public void GetStudyPlan(string id, string tranid)
+        {
+                var studyPlan = context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
+                if (studyPlan == null) return;
+                StudyPlan.StudyPlanDTO res = new(studyPlan.Result);
+                AddResponse(tranid, res);
+        }
     }
 
 }

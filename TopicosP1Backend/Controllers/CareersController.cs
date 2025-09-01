@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
+using static CareerApi.Models.Career;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -28,7 +29,7 @@ namespace TopicosP1Backend.Controllers
                 .ThenInclude(_ => _.Subjects)
                 .ThenInclude(_ => _.Prerequisites)
                 .ToListAsync();
-            return from a in careers select new CareerDTO(a);
+            return from a in careers select a.SimpleList();
 
         }
 

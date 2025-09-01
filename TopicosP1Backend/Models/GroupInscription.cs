@@ -9,5 +9,8 @@ namespace CareerApi.Models
         required public Group Group { get; set; }
         required public Inscription Inscription { get; set; }
         required public DateTime DateTime { get; set; }
+
+        public int Grade = 0;
+        public int Status = 0;   //0=Inscrita, 1=Terminada, 2=Retirada
     }
 }

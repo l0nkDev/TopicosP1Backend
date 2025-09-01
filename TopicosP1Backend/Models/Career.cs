@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using static CareerApi.Models.StudyPlan;
 
 namespace CareerApi.Models
 {
@@ -7,20 +8,12 @@ namespace CareerApi.Models
         public long Id { get; set; }
         required public string Name { get; set; }
         public IEnumerable<StudyPlan> StudyPlans { get; } = new List<StudyPlan>();
-    }
-
-    public class CareerDTO
-    {
-        public long Id { get; set; }
-        required public string Name { get; set; }
-        public IEnumerable<StudyPlanDTO> StudyPlans { get; } = new List<StudyPlanDTO>();
-
-        [SetsRequiredMembers]
-        public CareerDTO(Career career)
+        public CareerDTO SimpleList() => new CareerDTO(this);
+        public class CareerDTO(Career career)
         {
-            Id = career.Id;
-            Name = career.Name;
-            StudyPlans = from a in career.StudyPlans select new StudyPlanDTO(a);
+            public long Id { get; set; } = career.Id;
+            public string Name { get; set; } = career.Name;
+            public IEnumerable<StudyPlanDTO> StudyPlans { get; } = from a in career.StudyPlans select a.Simple();
         }
     }
 }

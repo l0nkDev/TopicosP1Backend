@@ -25,7 +25,7 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/StudyPlans
         [HttpGet]
-        public async Task<IEnumerable<StudyPlanDTO>> GetStudyPlans()
+        public async Task<IEnumerable<StudyPlan.StudyPlanDTO>> GetStudyPlans()
         {
             var db = await _context.StudyPlans.ToListAsync();
             var studyplans = from sp in db select GetStudyPlan(sp.Code).Result.Value;
@@ -34,12 +34,11 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/StudyPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StudyPlanDTO>> GetStudyPlan(string id)
+        public async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlan(string id)
         {
-            Console.WriteLine("GET EJECUTANDO");
             var studyPlan = await _context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return NotFound();
-            StudyPlanDTO res = new(studyPlan);
+            StudyPlan.StudyPlanDTO res = new(studyPlan);
             return res;
         }
 
@@ -47,15 +46,16 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("async/{id}")]
         public string GetStudyPlanAsync(string id)
         {
-            _queue.Add(id, () => GetStudyPlan(id));
-            return id;
+            string tranid = id.GetHashCode().ToString();
+            _queue.Add(id, () => _queue.GetStudyPlan(id, tranid));
+            return tranid;
         }
 
         // GET: api/StudyPlans/5
         [HttpGet("async/get/{id}")]
-        public async Task<ActionResult<StudyPlanDTO>> GetStudyPlanStatusAsync(string id)
+        public async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlanStatusAsync(string id)
         {
-            return (StudyPlanDTO)_queue.Get(id);
+            return (StudyPlan.StudyPlanDTO)_queue.Get(id);
         }
 
         // PUT: api/StudyPlans/5

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using static CareerApi.Models.Subject;
 
 namespace CareerApi.Models
 {
@@ -10,20 +11,14 @@ namespace CareerApi.Models
         public Career Career { get; set; } = null!;
         public IEnumerable<SpSubject> SpSubjects { get; set; } = new List<SpSubject>();
         public IEnumerable<Subject> Subjects { get; set; } = new List<Subject>();
-    }
-    public class StudyPlanDTO
-    {
-        [Key]
-        required public string Code { get; set; }
-        required public string Career { get; set; }
-        required public IEnumerable<SubjectDTO> Subjects { get; set; }
+        public StudyPlanDTO Simple() => new(this);
 
-        [SetsRequiredMembers]
-        public StudyPlanDTO(StudyPlan studyPlan)
+        public class StudyPlanDTO(StudyPlan studyPlan)
         {
-            Code = studyPlan.Code;
-            Career = studyPlan.Career.Name;
-            Subjects = from a in studyPlan.SpSubjects select new SubjectDTO(a);
+            public string Code { get; set; } = studyPlan.Code;
+            public string Career { get; set; } = studyPlan.Career.Name;
+            public IEnumerable<SpSubject.SpSubjectDTO> Subjects { get; set; } = 
+                from a in studyPlan.SpSubjects select a.SimpleList();
         }
     }
 }

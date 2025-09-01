@@ -16,39 +16,20 @@ namespace CareerApi.Models
         public IEnumerable<Subject> Prerequisites { get; set; } = new List<Subject>();
         public IEnumerable<SubjectDependency> PostDependencies { get; set; } = new List<SubjectDependency>();
         public IEnumerable<Subject> Postrequisites { get; set; } = new List<Subject>();
-    }
-    public class SubjectDTO
-    {
-        [Key]
-        required public string Code { get; set; }
-        required public string Title { get; set; }
-        required public int Credits { get; set; }
-        required public int Level { get; set; }
-        required public string Type { get; set; }
-        public IEnumerable<SubjectDTO2> Prerequisites { get; set; } = new List<SubjectDTO2>();
-
-        [SetsRequiredMembers]
-        public SubjectDTO(SpSubject spSubject)
+        public SubjectDTO SimpleList() => new(this);
+        public SubjectSimple Simple() => new(this);
+        public class SubjectDTO(Subject subject)
         {
-            Code = spSubject.Subject.Code;
-            Title = spSubject.Subject.Title;
-            Credits = spSubject.Credits;
-            Level = spSubject.Level;
-            Type = spSubject.Type switch { 0 => "Exclusive", 1 => "Shared", 2 => "Optative", 3 => "Elective", 4 => "Degree", _ => "Undefined" };
-            Prerequisites = from a in spSubject.Subject.PreDependencies where a.StudyPlan == spSubject.StudyPlan select new SubjectDTO2(a.Prerequisite);
+            public string Code { get; set; } = subject.Code;
+            public string Title { get; set; } = subject.Title;
+            public IEnumerable<SubjectSimple> Prerequisites { get; set; } = from a in subject.PreDependencies select a.Prerequisite.Simple();
+            public IEnumerable<SubjectSimple> Postrequisites { get; set; } = from a in subject.PostDependencies select a.Prerequisite.Simple();
         }
-    }
-   
-    public class SubjectDTO2
-    {
-        [Key]
-        required public string Code { get; set; }
-        required public string Title { get; set; }
 
-        [SetsRequiredMembers]
-        public SubjectDTO2(SubjectDTO subject) { Code = subject.Code; Title = subject.Title; }
-
-        [SetsRequiredMembers]
-        public SubjectDTO2(Subject subject) { Code = subject.Code; Title = subject.Title; }
+        public class SubjectSimple(Subject subject)
+        {
+            public string Code { get; set; } = subject.Code;
+            public string Title { get; set; } = subject.Title;
+        }
     }
 }

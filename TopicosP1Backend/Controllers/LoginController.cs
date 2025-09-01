@@ -34,7 +34,6 @@ namespace TopicosP1Backend.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(i => i.Login == request.Login && i.PasswordHash == hash);
             if (user == null) { return NotFound(); }
             return Ok(new LoginResponse { Login = user.Login, Token = user.Token });
-            
         }
 
         [HttpGet("{id}")]
