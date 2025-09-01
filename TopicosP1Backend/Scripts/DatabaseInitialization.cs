@@ -1,6 +1,7 @@
 ﻿using CareerApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TopicosP1Backend.Controllers;
 
 namespace TopicosP1Backend.Scripts
@@ -522,6 +523,150 @@ namespace TopicosP1Backend.Scripts
                 new() { StudyPlan = studyplans[0], Subject = subjects[71], Credits = 4, Level = 10, Type = 4},
             };
             context.SpSubjects.AddRange(spsubjects);
+
+            var gestions = new List<Gestion>()
+            {
+                new() { Year = 2020},
+                new() { Year = 2021},
+                new() { Year = 2022},
+                new() { Year = 2023},
+                new() { Year = 2024},
+                new() { Year = 2025},
+            };
+            context.Gestions.AddRange(gestions);
+
+            var periods = new List<Period>()
+            {
+                new() { Number = 1, Gestion = gestions[0]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[0]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[0]}, //Verano
+                new() { Number = 4, Gestion = gestions[0]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[0]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[0]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[0]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[0]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[1]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[1]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[1]}, //Verano
+                new() { Number = 4, Gestion = gestions[1]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[1]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[1]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[1]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[1]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[2]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[2]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[2]}, //Verano
+                new() { Number = 4, Gestion = gestions[2]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[2]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[2]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[2]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[2]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[3]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[3]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[3]}, //Verano
+                new() { Number = 4, Gestion = gestions[3]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[3]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[3]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[3]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[3]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[4]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[4]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[4]}, //Verano
+                new() { Number = 4, Gestion = gestions[4]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[4]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[4]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[4]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[4]}, //Mesa extraordinaria verano
+                new() { Number = 1, Gestion = gestions[5]}, //1er semestre
+                new() { Number = 2, Gestion = gestions[5]}, //2do semestre
+                new() { Number = 3, Gestion = gestions[5]}, //Verano
+                new() { Number = 4, Gestion = gestions[5]}, //Mesa del 1er Semestre
+                new() { Number = 5, Gestion = gestions[5]}, //Mesa del 2do Semestre
+                new() { Number = 6, Gestion = gestions[5]}, //Mesa extraordinaria 1er semestre
+                new() { Number = 7, Gestion = gestions[5]}, //Mesa extraordianria 2do semestre
+                new() { Number = 8, Gestion = gestions[5]}, //Mesa extraordinaria verano
+            };
+            context.Periods.AddRange(periods);
+
+            var modules = new List<Module>()
+            {
+                new() { Number = 236},
+            };
+            context.Modules.AddRange(modules);
+
+            var rooms = new List<Room>()
+            {
+                new() { Module = modules[0], Number = 11},
+                new() { Module = modules[0], Number = 12},
+                new() { Module = modules[0], Number = 13},
+                new() { Module = modules[0], Number = 14},
+                new() { Module = modules[0], Number = 15},
+                new() { Module = modules[0], Number = 16},
+                new() { Module = modules[0], Number = 17},
+                new() { Module = modules[0], Number = 21},
+                new() { Module = modules[0], Number = 22},
+                new() { Module = modules[0], Number = 23},
+                new() { Module = modules[0], Number = 24},
+                new() { Module = modules[0], Number = 25},
+                new() { Module = modules[0], Number = 26},
+                new() { Module = modules[0], Number = 27},
+                new() { Module = modules[0], Number = 31},
+                new() { Module = modules[0], Number = 32},
+                new() { Module = modules[0], Number = 33},
+                new() { Module = modules[0], Number = 34},
+                new() { Module = modules[0], Number = 35},
+                new() { Module = modules[0], Number = 36},
+                new() { Module = modules[0], Number = 37},
+                new() { Module = modules[0], Number = 38},
+                new() { Module = modules[0], Number = 40},
+                new() { Module = modules[0], Number = 41},
+                new() { Module = modules[0], Number = 42},
+                new() { Module = modules[0], Number = 43},
+                new() { Module = modules[0], Number = 44},
+                new() { Module = modules[0], Number = 45},
+                new() { Module = modules[0], Number = 46},
+            };
+            context.Rooms.AddRange(rooms);
+
+            var students = new List<Student>()
+            {
+                new() { FirstName = "Raul", LastName = "Farell Vaca"},
+                new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
+            };
+            context.Students.AddRange(students);
+
+            var inscriptions = new List<Inscription>()
+            {
+                new() { Student = students [1], Period = periods[16], Type = 0}, //1-2022 (2*8+1-1)
+                new() { Student = students [1], Period = periods[17], Type = 0}, //2-2022  (2*8+2-1)
+                new() { Student = students [1], Period = periods[24], Type = 0}, //1-2023  (3*8+1-1)
+                new() { Student = students [1], Period = periods[25], Type = 0}, //2-2023
+                new() { Student = students [1], Period = periods[32], Type = 0}, //1-2024
+                new() { Student = students [1], Period = periods[33], Type = 0}, //2-2024
+                new() { Student = students [1], Period = periods[33], Type = 2}, 
+                new() { Student = students [1], Period = periods[40], Type = 0},
+                new() { Student = students [1], Period = periods[40], Type = 1},
+                new() { Student = students [1], Period = periods[40], Type = 2},
+                new() { Student = students [1], Period = periods[41], Type = 0},
+                new() { Student = students [1], Period = periods[41], Type = 1},
+                new() { Student = students [1], Period = periods[41], Type = 2},
+            };
+            context.Inscriptions.AddRange(inscriptions);
+
+            var groupinscriptions = new List<GroupInscription>
+            {
+                
+            };
+
+
+            var timeslots = new List<TimeSlot>()
+            {
+
+            };
+            context.TimeSlots.AddRange(timeslots);
+
+
+
             context.SaveChanges();
         }
     }
@@ -540,50 +685,33 @@ namespace TopicosP1Backend.Scripts
 
     public class APIQueue
     {
-        private readonly IServiceScopeFactory scopeFactory;
-        private Context? context;
-        private readonly Thread? Thread = null;
-        private Queue<Transaction> q = [];
-        private Dictionary<string, object> responses = [];
+        Thread? Thread = null;
+        Queue<Transaction> q = [];
+        Dictionary<string, object> responses = [];
 
-        public APIQueue(IServiceScopeFactory scopeFactory) 
+        public APIQueue()
         {
-            this.scopeFactory = scopeFactory;
             Thread = new(BackgroundProcess);
             Thread.Start();
         }
-        
+
         public void BackgroundProcess()
         {
-            IServiceScope? scope = null;
+            while (true)
             {
-                while (true)
+                if (q.Count() != 0)
                 {
-                    if (q.Count() != 0)
-                    {
-                        if (scope == null)
-                        {
-                            scope = scopeFactory.CreateScope();
-                            context = scope.ServiceProvider.GetService<Context>();
-                        }
-                        Transaction i = q.Dequeue();
-                        Action a = i.Action;
-                        a();
-                    }
-                    else { scope?.Dispose(); scope = null; }
+                    Transaction i = q.Dequeue();
+                    Action a = i.Action;
+                    a();
                 }
+                Thread.Sleep(1000);
             }
         }
+
         public void Add(string id, Action action) => q.Enqueue(new Transaction() { Id = id, Action = action });
         public void AddResponse(string id, object obj) => responses.Add(id, obj);
         public object Get(string id) { object obj = responses[id]; responses.Remove(id); return obj; }
-        public void GetStudyPlan(string id, string tranid)
-        {
-                var studyPlan = context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefaultAsync(i => i.Code == id);
-                if (studyPlan == null) return;
-                StudyPlan.StudyPlanDTO res = new(studyPlan.Result);
-                AddResponse(tranid, res);
-        }
     }
 
 }
