@@ -6,6 +6,6 @@ namespace CareerApi.Models
     {
         public long Id { get; set; }
         required public Module Module { get; set; }
-        required public long NUmber { get; set; }
+        required public long Number { get; set; }
     }
 }
