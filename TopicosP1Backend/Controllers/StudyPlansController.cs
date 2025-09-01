@@ -52,8 +52,8 @@ namespace TopicosP1Backend.Controllers
         }
 
         // GET: api/StudyPlans/5
-        [HttpGet("async/get/{id}")]
-        public async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlanStatusAsync(string id)
+        [HttpGet("async/{id}")]
+        public StudyPlan.StudyPlanDTO GetStudyPlanStatus(string id)
         {
             return (StudyPlan.StudyPlanDTO)_queue.Get(id);
         }
