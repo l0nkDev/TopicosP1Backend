@@ -632,13 +632,26 @@ namespace TopicosP1Backend.Scripts
             {
                 new() { FirstName = "Raul", LastName = "Farell Vaca"},
                 new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
+                new() { FirstName = "Joaquin", LastName = "Chumacero" },
             };
             context.Students.AddRange(students);
+
+            var teachers = new List<Teacher>()
+            {
+                new() { FirstName = "", LastName = ""},
+                new() { FirstName = "Rufino", LastName = ""},
+                new() { FirstName = "Angelica", LastName = "Garzon"},
+                new() { FirstName = "Braulio", LastName = ""},
+                new() { FirstName = "", LastName = "Oropeza"},
+                new() { FirstName = "", LastName = ""},
+            };
+            context.Teachers.AddRange(teachers);
 
             var studentsstudyplans = new List<StudentStudyPlan>()
             {
                 new() {Student = students[0], StudyPlans = studyplans[0]},
                 new() {Student = students[1], StudyPlans = studyplans[0]},
+                new() {Student = students[2], StudyPlans = studyplans[0]},
             };
             context.StudentStudyPlans.AddRange(studentsstudyplans);
 
@@ -658,6 +671,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Student = students[1], Period = periods[41], Type = 1},
                 new() { Student = students[1], Period = periods[41], Type = 2},
                 new() { Student = students[0], Period = periods[41], Type = 0},
+                new() { Student = students[2], Period = periods[16], Type = 0},
             };
             context.Inscriptions.AddRange(inscriptions);
 
@@ -692,38 +706,70 @@ namespace TopicosP1Backend.Scripts
 
             var groups = new List<Group>()
             {
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[38]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[46]},
-                new() { Code = "SB", Mode = "Presencial", Periodo = periods[40], Subject = subjects[44]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[43]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[45]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[50]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[78]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[74]},
-                new() { Code = "SC", Mode = "Presencial", Periodo = periods[41], Subject = subjects[53]},
-                new() { Code = "SB", Mode = "Presencial", Periodo = periods[41], Subject = subjects[46]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[38], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[46], Teacher = teachers[0]},
+                new() { Code = "SB", Mode = "Presencial", Periodo = periods[40], Subject = subjects[44], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[43], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[45], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[50], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[78], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[74], Teacher = teachers[0]},
+                new() { Code = "SC", Mode = "Presencial", Periodo = periods[41], Subject = subjects[53], Teacher = teachers[0]},
+                new() { Code = "SB", Mode = "Presencial", Periodo = periods[41], Subject = subjects[46], Teacher = teachers[0]},
+                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[3], Teacher = teachers[1]},
+                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[2], Teacher = teachers[2]},
+                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[1], Teacher = teachers[3]},
+                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[4], Teacher = teachers[4]},
+                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[0], Teacher = teachers[5]},
             };
             context.Groups.AddRange(groups);
 
             var groupinscriptions = new List<GroupInscription>
             {
-                new() { Group = groups[0], Inscription = inscriptions[7], Grade = 83, Status = 1},
+                new() { Group = groups[0], Inscription = inscriptions[7]},
                 new() { Group = groups[2], Inscription = inscriptions[7]},
-                new() { Group = groups[3], Inscription = inscriptions[7], Grade = 80, Status = 1},
-                new() { Group = groups[4], Inscription = inscriptions[7], Grade = 63, Status = 1},
-                new() { Group = groups[5], Inscription = inscriptions[7], Grade = 70, Status = 1},
+                new() { Group = groups[3], Inscription = inscriptions[7]},
+                new() { Group = groups[4], Inscription = inscriptions[7]},
+                new() { Group = groups[5], Inscription = inscriptions[7]},
                 new() { Group = groups[1], Inscription = inscriptions[8]},
-                new() { Group = groups[1], Inscription = inscriptions[9], Status = 2},
-                new() { Group = groups[2], Inscription = inscriptions[9], Status = 2},
-                new() { Group = groups[6], Inscription = inscriptions[13], Status = 0},
-                new() { Group = groups[7], Inscription = inscriptions[13], Status = 0},
-                new() { Group = groups[6], Inscription = inscriptions[10], Status = 0},
-                new() { Group = groups[7], Inscription = inscriptions[10], Status = 0},
+                new() { Group = groups[1], Inscription = inscriptions[9]},
+                new() { Group = groups[2], Inscription = inscriptions[9]},
+                new() { Group = groups[6], Inscription = inscriptions[13]},
+                new() { Group = groups[7], Inscription = inscriptions[13]},
+                new() { Group = groups[6], Inscription = inscriptions[10]},
+                new() { Group = groups[7], Inscription = inscriptions[10]},
                 new() { Group = groups[9], Inscription = inscriptions[10]},
-                new() { Group = groups[8], Inscription = inscriptions[11], Status = 0},
-                new() { Group = groups[9], Inscription = inscriptions[12], Status = 2},
+                new() { Group = groups[8], Inscription = inscriptions[11]},
+                new() { Group = groups[9], Inscription = inscriptions[12]},
+                new() { Group = groups[10], Inscription = inscriptions[14]},
+                new() { Group = groups[11], Inscription = inscriptions[14]},
+                new() { Group = groups[12], Inscription = inscriptions[14]},
+                new() { Group = groups[13], Inscription = inscriptions[14]},
+                new() { Group = groups[14], Inscription = inscriptions[14]},
             };
             context.GroupInscriptions.AddRange(groupinscriptions);
+
+            var studentgroups = new List<StudentGroups>
+            {
+                new() { Group = groups[0], Student = students[0], Grade = 83, Status = 1},
+                new() { Group = groups[3], Student = students[0], Grade = 80, Status = 1},
+                new() { Group = groups[4], Student = students[0], Grade = 63, Status = 1},
+                new() { Group = groups[5], Student = students[0], Grade = 70, Status = 1},
+                new() { Group = groups[1], Student = students[0], Status = 2},
+                new() { Group = groups[2], Student = students[0], Status = 2},
+                new() { Group = groups[6], Student = students[1]},
+                new() { Group = groups[7], Student = students[1]},
+                new() { Group = groups[6], Student = students[0]},
+                new() { Group = groups[7], Student = students[0]},
+                new() { Group = groups[8], Student = students[0]},
+                new() { Group = groups[9], Student = students[0]},
+                new() { Group = groups[10], Student = students[2], Grade = 57, Status = 1},
+                new() { Group = groups[11], Student = students[2], Grade = 95, Status = 1},
+                new() { Group = groups[12], Student = students[2], Grade = 51, Status = 1},
+                new() { Group = groups[13], Student = students[2], Grade = 82, Status = 1},
+                new() { Group = groups[14], Student = students[2], Grade = 66, Status = 1},
+            };
+            context.StudentGroups.AddRange(studentgroups);
 
             context.SaveChanges();
         }
@@ -731,7 +777,7 @@ namespace TopicosP1Backend.Scripts
 
     public class Util
     {
-        static public int Hash(String s) { return s.Select(a => (int)a).Sum(); }
+        static public int Hash(string s) { return s.Select(a => (int)a).Sum(); }
         static public string GenToken() { return string.Join("", Enumerable.Repeat(0, 100).Select(n => (char)new Random().Next(32, 127))).Replace("/", "").Replace(" ", "").Replace("\\", "").Replace("\"", "").Replace("'", ""); }
     }
 

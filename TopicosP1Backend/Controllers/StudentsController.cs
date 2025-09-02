@@ -41,6 +41,15 @@ namespace TopicosP1Backend.Controllers
 
             return student;
         }
+        [HttpGet("{id}/history")]
+        public async Task<ActionResult<List<StudentGroups.HistoryEntry>>> GetStudentHistory(long id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) { return NotFound(); }
+            var history = await _context.StudentGroups.Include(_=>_.Group).ThenInclude(_=>_.Subject).Where(_=>_.Student.Id == id && _.Status != 2).ToListAsync();
+            IEnumerable<StudentGroups.HistoryEntry> res = from a in history select a.Simple();
+            return res.ToList();
+        }
 
         // PUT: api/Students/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

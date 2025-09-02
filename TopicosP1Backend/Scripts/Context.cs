@@ -22,10 +22,12 @@ namespace TopicosP1Backend.Scripts
         public DbSet<Room> Rooms { get; set; } = default!;
         public DbSet<SpSubject> SpSubjects { get; set; } = default!;
         public DbSet<Student> Students { get; set; } = default!;
+        public DbSet<StudentGroups> StudentGroups { get; set; } = default!;
         public DbSet<StudentStudyPlan> StudentStudyPlans { get; set; } = default!;
         public DbSet<StudyPlan> StudyPlans { get; set; } = default!;
         public DbSet<Subject> Subjects { get; set; } = default!;
         public DbSet<SubjectDependency> SubjectDependencies { get; set; } = default!;
+        public DbSet<Teacher> Teachers { get; set; } = default!;
         public DbSet<TimeSlot> TimeSlots { get; set; } = default!;
         public DbSet<User> Users { get; set; } = default!;
         public char GetRequestUserRole(HttpRequest request)
