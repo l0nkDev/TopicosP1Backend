@@ -29,18 +29,18 @@ namespace TopicosP1Backend.Controllers
         {
             int tranid = "GetStudyPlans".GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(() => _queue.GetStudyPlans(tranid));
             return tranid;
         }
 
         // GET: api/StudyPlans/5
         [HttpGet("{id}")]
-        public object GetStudyPlans(string id)
+        public object GetStudyPlan(string id)
         {
-            int tranid = ("GetStudyPlans " + id.ToString()).GetHashCode();
+            int tranid = ("GetStudyPlan " + id.ToString()).GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(() => _queue.GetStudyPlan(id, tranid));
             return tranid;
         }
