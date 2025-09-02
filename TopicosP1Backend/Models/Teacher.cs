@@ -3,13 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CareerApi.Models
 {
-    public class Student
+    public class Teacher
     {
         public long Id { get; set; }
         required public string FirstName { get; set; }
         required public string LastName { get; set; }
-        public IEnumerable<StudyPlan> StudyPlans { get; set; } = new List<StudyPlan>();
-        public IEnumerable<StudentGroups> StudentGroups { get; set; } = new List<StudentGroups>();
         public IEnumerable<Group> Groups { get; set; } = new List<Group>();
     }
 }
