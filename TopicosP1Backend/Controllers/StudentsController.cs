@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
+using System.Collections;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -15,10 +16,12 @@ namespace TopicosP1Backend.Controllers
     public class StudentsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public StudentsController(Context context)
+        public StudentsController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         // GET: api/Students
@@ -43,29 +46,23 @@ namespace TopicosP1Backend.Controllers
         }
 
         [HttpGet("{id}/history")]
-        public async Task<ActionResult<List<StudentGroups.HistoryEntry>>> GetStudentHistory(long id)
+        public object GetStudentHistory(long id)
         {
-            var student = await _context.Students.FindAsync(id);
-            if (student == null) { return NotFound(); }
-            var history = await _context.StudentGroups.Include(_ => _.Group).ThenInclude(_ => _.Subject).Where(_ => _.Student.Id == id && _.Status != 2).ToListAsync();
-            IEnumerable<StudentGroups.HistoryEntry> res = from a in history select a.Simple();
-            return res.ToList();
+            int tranid = ("GetStudentHistory " + id.ToString()).GetHashCode();
+            if (_queue.IsQueued(tranid) != null) return tranid;
+            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            _queue.Add(() => _queue.GetStudentHistory(id, tranid));
+            return tranid;
         }
 
         [HttpGet("{id}/available")]
-        public async Task<ActionResult<List<Subject.SubjectSimple>>> GetStudentAvailable(long id)
+        public object GetStudentAvailable(long id)
         {
-            var student = await _context.Students
-                .Include(_=>_.StudentGroups).ThenInclude(_=>_.Group).ThenInclude(_=>_.Subject)
-                .Include(_=>_.StudyPlans).ThenInclude(_=>_.SpSubjects).ThenInclude(_=>_.Subject).ThenInclude(_=>_.Prerequisites)
-                .FirstAsync(_=>_.Id == id);
-            if (student == null) { return NotFound(); }
-            var spsubjects = (from sp in student.StudyPlans select sp.SpSubjects).SelectMany(_ => _).Distinct().ToList();
-            var passed = (from sub in student.StudentGroups where sub.Grade >= 51 && sub.Status == 1 select sub.Group.Subject).Distinct().ToList();
-            List<Subject> available = new List<Subject>();
-            foreach (var sp in spsubjects)
-                if (sp.Subject.Prerequisites.All(_ => passed.Contains(_))) available.Add(sp.Subject);
-            return (from a in available.Except(passed) select a.Simple()).ToList();
+            int tranid = ("GetStudentAvailable " + id.ToString()).GetHashCode();
+            if (_queue.IsQueued(tranid) != null) return tranid;
+            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            _queue.Add(() => _queue.GetStudentAvailable(id, tranid));
+            return tranid;
         }
 
         // PUT: api/Students/5

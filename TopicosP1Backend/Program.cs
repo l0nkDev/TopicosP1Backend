@@ -11,8 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Context>(opt =>
-//    opt.UseInMemoryDatabase("main"));
-    opt.UseSqlite("Data Source=test.db"));
+    opt.UseInMemoryDatabase("main"));
+//    opt.UseSqlite("Data Source=v1.db"));
 builder.Services.AddSingleton<APIQueue>();
 
 var app = builder.Build();

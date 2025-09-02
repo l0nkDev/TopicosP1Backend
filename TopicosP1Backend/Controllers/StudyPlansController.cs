@@ -27,19 +27,21 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetStudyPlans()
         {
-            string tranid = "All studyplans".GetHashCode().ToString();
+            int tranid = "GetStudyPlans".GetHashCode();
+            if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(tranid, () => _queue.GetStudyPlans(tranid));
+            _queue.Add(() => _queue.GetStudyPlans(tranid));
             return tranid;
         }
 
         // GET: api/StudyPlans/5
         [HttpGet("{id}")]
-        public object GetStudyPlanAsync(string id)
+        public object GetStudyPlans(string id)
         {
-            string tranid = id.GetHashCode().ToString();
+            int tranid = ("GetStudyPlans " + id.ToString()).GetHashCode();
+            if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(tranid, () => _queue.GetStudyPlan(id, tranid));
+            _queue.Add(() => _queue.GetStudyPlan(id, tranid));
             return tranid;
         }
 
