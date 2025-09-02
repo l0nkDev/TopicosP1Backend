@@ -683,7 +683,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[43], Teacher = teachers[0]},
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[45], Teacher = teachers[0]},
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[50], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[0], Quota = 20},
                 new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[74], Teacher = teachers[0], Quota = 120},
                 new() { Code = "SC", Mode = "Presencial", Period = periods[41], Subject = subjects[53], Teacher = teachers[0]},
                 new() { Code = "SB", Mode = "Presencial", Period = periods[41], Subject = subjects[46], Teacher = teachers[0]},

@@ -47,7 +47,6 @@ namespace TopicosP1Backend.Scripts
         public int? IsQueued(int id) => queued.Contains(id) ? id : null;
         public ActionResult<StudyPlan.StudyPlanDTO> GetStudyPlan(string id, int hash)
         {
-            if (queued.Contains(hash)) return new OkResult();
             var studyPlan = context.StudyPlans.Include(_ => _.Career).Include(_ => _.Subjects).ThenInclude(_ => _.Prerequisites).FirstOrDefault(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             StudyPlan.StudyPlanDTO res = new(studyPlan);

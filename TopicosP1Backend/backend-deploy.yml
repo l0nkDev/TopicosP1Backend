@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: topicosp1backend
-        image: l0nkdev/topicosp1backend:v6
+        image: l0nkdev/topicosp1backend:v7
         ports:
         - containerPort: 80
         env:
