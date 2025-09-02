@@ -72,11 +72,13 @@ namespace TopicosP1Backend.Scripts
             return res;
         }
 
-        public ActionResult<List<Subject.SubjectSimple>> GetStudentAvailable(long id, int hash)
+        public ActionResult<List<Subject.SubjectWithGroups>> GetStudentAvailable(long id, int hash)
         {
             var student = context.Students
                 .Include(_ => _.StudentGroups).ThenInclude(_ => _.Group).ThenInclude(_ => _.Subject)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Prerequisites)
+                .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Teacher)
+                .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)
                 .First(_ => _.Id == id);
             if (student == null) { return new NotFoundResult(); }
             var spsubjects = (from sp in student.StudyPlans select sp.SpSubjects).SelectMany(_ => _).ToList();
@@ -84,7 +86,7 @@ namespace TopicosP1Backend.Scripts
             List<Subject> available = new List<Subject>();
             foreach (var sp in spsubjects)
                 if (sp.Subject.Prerequisites.All(_ => passed.Contains(_))) available.Add(sp.Subject);
-            var res = (from a in available.Except(passed) select a.Simple()).Distinct().ToList();
+            var res = (from a in available.Except(passed).Distinct().ToList() select a.WithGroups()).ToList();
             try { AddResponse(hash, res); } catch { }
             return res;
         }

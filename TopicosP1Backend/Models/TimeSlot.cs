@@ -10,6 +10,5 @@ namespace CareerApi.Models
         required public TimeOnly EndTime { get; set; }
         required public Room Room { get; set; }
         required public Period Period { get; set; }
-        required public Group Group { get; set; }
     }
 }

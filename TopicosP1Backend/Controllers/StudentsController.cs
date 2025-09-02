@@ -50,7 +50,7 @@ namespace TopicosP1Backend.Controllers
         {
             int tranid = ("GetStudentHistory " + id.ToString()).GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(() => _queue.GetStudentHistory(id, tranid));
             return tranid;
         }
@@ -60,7 +60,7 @@ namespace TopicosP1Backend.Controllers
         {
             int tranid = ("GetStudentAvailable " + id.ToString()).GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, false); } catch { Console.WriteLine("Failed!"); }
+            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(() => _queue.GetStudentAvailable(id, tranid));
             return tranid;
         }

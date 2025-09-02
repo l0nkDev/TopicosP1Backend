@@ -677,21 +677,21 @@ namespace TopicosP1Backend.Scripts
 
             var groups = new List<Group>()
             {
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[38], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[46], Teacher = teachers[0]},
-                new() { Code = "SB", Mode = "Presencial", Periodo = periods[40], Subject = subjects[44], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[43], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[45], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[40], Subject = subjects[50], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[78], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Periodo = periods[41], Subject = subjects[74], Teacher = teachers[0]},
-                new() { Code = "SC", Mode = "Presencial", Periodo = periods[41], Subject = subjects[53], Teacher = teachers[0]},
-                new() { Code = "SB", Mode = "Presencial", Periodo = periods[41], Subject = subjects[46], Teacher = teachers[0]},
-                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[3], Teacher = teachers[1]},
-                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[2], Teacher = teachers[2]},
-                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[1], Teacher = teachers[3]},
-                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[4], Teacher = teachers[4]},
-                new() { Code = "Z2", Mode = "Presencial", Periodo = periods[16], Subject = subjects[0], Teacher = teachers[5]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[38], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[46], Teacher = teachers[0]},
+                new() { Code = "SB", Mode = "Presencial", Period = periods[40], Subject = subjects[44], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[43], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[45], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[50], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[0]},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[74], Teacher = teachers[0], Quota = 120},
+                new() { Code = "SC", Mode = "Presencial", Period = periods[41], Subject = subjects[53], Teacher = teachers[0]},
+                new() { Code = "SB", Mode = "Presencial", Period = periods[41], Subject = subjects[46], Teacher = teachers[0]},
+                new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[3], Teacher = teachers[1]},
+                new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[2], Teacher = teachers[2]},
+                new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[1], Teacher = teachers[3]},
+                new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[4], Teacher = teachers[4]},
+                new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[0], Teacher = teachers[5]},
             };
             context.Groups.AddRange(groups);
 
