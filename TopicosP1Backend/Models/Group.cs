@@ -9,7 +9,9 @@ namespace CareerApi.Models
         required public string Mode { get; set; }
         required public Period Periodo { get; set; }
         required public Subject Subject { get; set; }
+        public long Quota { get; set; }
         public IEnumerable<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
+        public IEnumerable<GroupInscription> GroupInscriptions { get; set; } = new List<GroupInscription>();
         public IEnumerable<Inscription> Inscriptions { get; set; } = new List<Inscription>();
     }
 }
