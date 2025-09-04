@@ -48,43 +48,43 @@ namespace TopicosP1Backend.Scripts
             }
         }
 
-        public object? Execute(Context context)
+        public async Task<object?> Execute(Context context)
         {
             switch (Function)
             {
-                case Function.GetStudyPlan: return GetStudyPlan(context, (string)Args[0]);
-                case Function.GetStudyPlans: return GetStudyPlans(context);
-                case Function.GetStudentHistory: return GetStudentHistory(context, (long)Args[0]);
-                case Function.GetStudentAvailable: return GetStudentAvailable(context, (long)Args[0]);
+                case Function.GetStudyPlan: return await GetStudyPlan(context, (string)Args[0]);
+                case Function.GetStudyPlans: return await GetStudyPlans(context);
+                case Function.GetStudentHistory: return await GetStudentHistory(context, (long)Args[0]);
+                case Function.GetStudentAvailable: return await GetStudentAvailable(context, (long)Args[0]);
             }
             return null;
         }
-        private static ActionResult<StudyPlan.StudyPlanDTO> GetStudyPlan(Context context, string id)
+        private static async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlan(Context context, string id)
         {
-            var studyPlan = context.StudyPlans.FirstOrDefault(i => i.Code == id);
+            var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             StudyPlan.StudyPlanDTO res = new(studyPlan);
             return res;
         }
-        private static IEnumerable<StudyPlan.StudyPlanDTO> GetStudyPlans(Context context)
+        private static async Task<IEnumerable<StudyPlan.StudyPlanDTO>> GetStudyPlans(Context context)
         {
-            var db = context.StudyPlans.ToListAsync();
-            var studyplans = from sp in db.Result select new StudyPlan.StudyPlanDTO(sp);
+            var db = await context.StudyPlans.ToListAsync();
+            var studyplans = from sp in db select new StudyPlan.StudyPlanDTO(sp);
             return studyplans;
         }
 
-        private static ActionResult<List<StudentGroups.HistoryEntry>> GetStudentHistory(Context context, long id)
+        private static async Task<ActionResult<List<StudentGroups.HistoryEntry>>> GetStudentHistory(Context context, long id)
         {
-            var student = context.Students.Find(id);
+            var student = await context.Students.FindAsync(id);
             if (student == null) { return new NotFoundResult(); }
-            var history = context.StudentGroups.Where(_ => _.Student.Id == id && _.Status != 2).ToList();
+            var history = await context.StudentGroups.Where(_ => _.Student.Id == id && _.Status != 2).ToListAsync();
             List<StudentGroups.HistoryEntry> res = [.. (from a in history select a.Simple())];
             return res;
         }
 
-        private static ActionResult<List<Subject.SubjectWithGroups>> GetStudentAvailable(Context context, long id)
+        private static async Task<ActionResult<List<Subject.SubjectWithGroups>>> GetStudentAvailable(Context context, long id)
         {
-            var student = context.Students.First(_ => _.Id == id);
+            var student = await context.Students.FirstAsync(_ => _.Id == id);
             if (student == null) { return new NotFoundResult(); }
             var spsubjects = (from sp in student.StudyPlans select sp.SpSubjects).SelectMany(_ => _).ToList();
             var passed = (from sub in student.StudentGroups where sub.Grade >= 51 && sub.Status == 1 select sub.Group.Subject).ToList();

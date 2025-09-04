@@ -18,6 +18,7 @@ builder.Services.AddDbContext<Context>(opt =>
 builder.Services.AddDbContext<CacheContext>(opt =>
     opt.UseSqlite("Data Source=cache.db"));
 builder.Services.AddSingleton<APIQueue>();
+builder.Services.AddHostedService<QueueWorker>();
 
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
