@@ -52,6 +52,8 @@ namespace TopicosP1Backend.Controllers
 
             try
             {
+                var oldSubject = await _context.Subjects.FindAsync(id);
+                oldSubject.Title = subject.Title;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
