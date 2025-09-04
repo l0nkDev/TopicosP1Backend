@@ -9,11 +9,11 @@ namespace TopicosP1Backend.Scripts
 {
     public enum Function
     {
-        GetStudyPlan, GetStudyPlans,
+        GetStudyPlan, GetStudyPlans, PostStudyPlan, PutStudyPlan, DeleteStudyPlan,
+        GetGestion, GetGestions, PostGestion, PutGestion, DeleteGestion,
+        GetPeriod, GetPeriods, PostPeriod, PutPeriod, DeletePeriod,
+        GetSubject, GetSubjects, PostSubject, PutSubject, DeleteSubject,
         GetStudentHistory, GetStudentAvailable,
-        GetGestion, GetGestions, PostGestion,
-        PostPeriod, GetPeriods, GetPeriod,
-        GetSubject, GetSubjects, PostSubject
     }
 
     public class QueuedFunction
@@ -62,8 +62,6 @@ namespace TopicosP1Backend.Scripts
             {
                 case Function.GetStudyPlan: return await StudyPlan.Get(context, ItemIds[0]);
                 case Function.GetStudyPlans: return await StudyPlan.GetAll(context);
-                case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
-                case Function.GetStudentAvailable: return await Student.Available(context, long.Parse(ItemIds[0]));
                 case Function.GetGestion: return await Gestion.Get(context, long.Parse(ItemIds[0]));
                 case Function.GetGestions: return await Gestion.GetAll(context);
                 case Function.PostGestion: return await Gestion.Post(context, JsonSerializer.Deserialize<Gestion>(Body));
@@ -73,6 +71,9 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
                 case Function.GetSubjects: return await Subject.GetAll(context);
                 case Function.PostSubject: return await Subject.Post(context, JsonSerializer.Deserialize<Subject.PostSubject>(Body));
+                case Function.DeleteSubject: return await Subject.Delete(context, ItemIds[0]);
+                case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
+                case Function.GetStudentAvailable: return await Student.Available(context, long.Parse(ItemIds[0]));
             }
             return null;
         }

@@ -77,5 +77,13 @@ namespace CareerApi.Models
             catch { return new ConflictResult(); }
             return subject;
         }
+        public static async Task<IActionResult> Delete(Context _context, string id)
+        {
+            var subject = await _context.Subjects.FindAsync(id);
+            if (subject == null) return new NotFoundResult();
+            _context.Subjects.Remove(subject);
+            await _context.SaveChangesAsync();
+            return new NoContentResult();
+        }
     }
 }

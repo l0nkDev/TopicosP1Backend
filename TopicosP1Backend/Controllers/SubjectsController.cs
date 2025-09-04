@@ -56,7 +56,7 @@ namespace TopicosP1Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubjectExists(id))
+                if (!_context.Subjects.Any(e => e.Code == id))
                 {
                     return NotFound();
                 }
@@ -80,18 +80,9 @@ namespace TopicosP1Backend.Controllers
 
         // DELETE: api/Subjects/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSubject(string id)
+        public object DeleteSubject(string id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-
-            _context.Subjects.Remove(subject);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return _queue.Request(Function.DeleteSubject, [id], "", $"DeleteSubject {id}");
         }
 
         private bool SubjectExists(string id)

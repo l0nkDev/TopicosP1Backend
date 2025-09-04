@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using TopicosP1Backend.Scripts;
-using static CareerApi.Models.Subject;
 
 namespace CareerApi.Models
 {
