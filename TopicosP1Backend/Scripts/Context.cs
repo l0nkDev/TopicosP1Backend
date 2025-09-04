@@ -77,6 +77,17 @@ namespace TopicosP1Backend.Scripts
                     r => r.HasOne(e => e.Prerequisite).WithMany(e => e.PostDependencies),
                     s => s.HasOne(e => e.Postrequisite).WithMany(e => e.PreDependencies)
                 );
+
+            modelBuilder.Entity<StudyPlan>().Navigation(_ => _.Subjects).AutoInclude();
+            modelBuilder.Entity<StudyPlan>().Navigation(_ => _.Career).AutoInclude();
+            modelBuilder.Entity<Subject>().Navigation(_ => _.PreDependencies).AutoInclude();
+            modelBuilder.Entity<Subject>().Navigation(_ => _.Groups).AutoInclude();
+            modelBuilder.Entity<Student>().Navigation(_ => _.StudentGroups).AutoInclude();
+            modelBuilder.Entity<Student>().Navigation(_ => _.StudyPlans).AutoInclude();
+            modelBuilder.Entity<Group>().Navigation(_ => _.Teacher).AutoInclude();
+            modelBuilder.Entity<Group>().Navigation(_ => _.Period).AutoInclude();
+            modelBuilder.Entity<Period>().Navigation(_ => _.Gestion).AutoInclude();
+            //modelBuilder.Entity<Gestion>().Navigation(_ => _.Periods).AutoInclude();
         }
     }
 

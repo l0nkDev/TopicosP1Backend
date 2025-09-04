@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using TopicosP1Backend.Scripts;
+using TopicosP1Backend.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +12,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Context>(opt =>
-    opt.UseInMemoryDatabase("main"));
-//    opt.UseSqlite("Data Source=v1.db"));
+//    opt.UseNpgsql("Username=postgres; Password=\\^MGbat%=5deeuN; Host=34.55.58.2; Database=topicos;"));
+//    opt.UseInMemoryDatabase("main"));
+    opt.UseSqlite("Data Source=main.db"));
+builder.Services.AddDbContext<CacheContext>(opt =>
+    opt.UseSqlite("Data Source=cache.db"));
 builder.Services.AddSingleton<APIQueue>();
+builder.Services.AddSingleton<QueueWorker>();
+builder.Services.AddSingleton<IHostedService>(_ => _.GetRequiredService<QueueWorker>());
+builder.Services.AddSingleton<IQueueWorkerStopper>(_ => _.GetRequiredService<QueueWorker>());
 
 var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -31,5 +39,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.CreateDbIfNotExists();
+app.CreateCacheIfNotExists();
+
 
 app.Run();

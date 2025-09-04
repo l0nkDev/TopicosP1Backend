@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -23,14 +24,15 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Periods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Period>>> GetPeriods()
+        public async Task<ActionResult<IEnumerable<Period.PeriodDTO>>> GetPeriods()
         {
-            return await _context.Periods.ToListAsync();
+            var periods = await _context.Periods.ToListAsync();
+            return (from a in periods select a.Simple()).ToList();
         }
 
         // GET: api/Periods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Period>> GetPeriod(long id)
+        public async Task<ActionResult<Period.PeriodDTO>> GetPeriod(long id)
         {
             var period = await _context.Periods.FindAsync(id);
 
@@ -39,20 +41,23 @@ namespace TopicosP1Backend.Controllers
                 return NotFound();
             }
 
-            return period;
+            return period.Simple();
         }
 
         // PUT: api/Periods/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPeriod(long id, Period period)
+        public async Task<IActionResult> PutPeriod(long id, Period.PeriodDTO period)
         {
-            if (id != period.Id)
+            Period? p = await _context.Periods.FindAsync(id);
+            if (p == null) return BadRequest();
+            p.Number = period.Number; p.Gestion = await _context.Gestions.FindAsync(period.Gestion);
+
+            if (id != p.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(period).State = EntityState.Modified;
+            _context.Entry(p).State = EntityState.Modified;
 
             try
             {
@@ -76,12 +81,14 @@ namespace TopicosP1Backend.Controllers
         // POST: api/Periods
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Period>> PostPeriod(Period period)
+        public async Task<ActionResult<Period>> PostPeriod(Period.PostDTO period)
         {
-            _context.Periods.Add(period);
+            Gestion? g = await _context.Gestions.FindAsync(period.Gestion);
+            if (g == null) { g = new() { Year = period.Gestion }; _context.Gestions.Add(g); }
+            Period p = new() { Id = period.Id, Number = period.Number, Gestion = g };
+            _context.Periods.Add(p);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPeriod", new { id = period.Id }, period);
+            return CreatedAtAction("GetPeriod", new { id = p.Id }, p.Simple());
         }
 
         // DELETE: api/Periods/5

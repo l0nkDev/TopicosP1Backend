@@ -7,7 +7,7 @@ namespace CareerApi.Models
         public long Id { get; set; }
         required public string Login { get; set; }
         required public string Token { get; set; }
-        required public int PasswordHash { get; set; }
+        required public string PasswordHash { get; set; }
         required public char Role { get; set; } //S: Estudiante, T: Docente, A: Administrativo, C: CPD
     }
 }

@@ -27,7 +27,7 @@ namespace TopicosP1Backend.Controllers
         {
             if (request == null) { return BadRequest(); }
 
-            int hash = Util.Hash(request.Password);
+            string hash = Util.Hash(request.Password);
             Console.WriteLine(request.Login);
             Console.WriteLine(hash);
 
