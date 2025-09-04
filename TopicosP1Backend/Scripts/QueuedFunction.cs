@@ -12,7 +12,8 @@ namespace TopicosP1Backend.Scripts
         GetStudyPlan, GetStudyPlans,
         GetStudentHistory, GetStudentAvailable,
         GetGestion, GetGestions, PostGestion,
-        PostPeriod, GetPeriods, GetPeriod
+        PostPeriod, GetPeriods, GetPeriod,
+        GetSubject, GetSubjects, PostSubject
     }
 
     public class QueuedFunction
@@ -34,7 +35,7 @@ namespace TopicosP1Backend.Scripts
                 Hash = Hash,
                 Function = (Function)Function,
                 ItemIds = JsonSerializer.Deserialize<List<string>>(ItemIds),
-                Body = Body 
+                Body = Body
             };
 
             public DBItem(QueuedFunction qf)
@@ -46,7 +47,7 @@ namespace TopicosP1Backend.Scripts
             }
 
             [JsonConstructor]
-            public DBItem(string Hash, int Function, string ItemIds, string Body) 
+            public DBItem(string Hash, int Function, string ItemIds, string Body)
             {
                 this.Hash = Hash;
                 this.Function = Function;
@@ -69,6 +70,9 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetPeriod: return await GetPeriod(context, long.Parse(ItemIds[0]));
                 case Function.GetPeriods: return await GetPeriods(context);
                 case Function.PostPeriod: return await PostPeriod(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
+                case Function.GetSubject: return await GetSubject(context, ItemIds[0]);
+                case Function.GetSubjects: return await GetSubjects(context);
+                case Function.PostSubject: return await PostSubject(context, JsonSerializer.Deserialize<Subject.PostSubject>(Body));
             }
             return null;
         }
@@ -149,6 +153,37 @@ namespace TopicosP1Backend.Scripts
             _context.Periods.Add(p);
             await _context.SaveChangesAsync();
             return new OkResult();
+        }
+        public async Task<ActionResult<IEnumerable<Subject.SubjectSimple>>> GetSubjects(Context _context)
+        {
+            var l = await _context.Subjects.ToListAsync();
+            return (from a in l select a.Simple()).ToList();
+        }
+
+        // GET: api/Subjects/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Subject.SubjectSimple>> GetSubject(Context _context, string id)
+        {
+            var subject = await _context.Subjects.FindAsync(id);
+
+            if (subject == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return subject.Simple();
+        }
+
+        public async Task<ActionResult<Subject>> PostSubject(Context _context, Subject.PostSubject s)
+        {
+            Subject subject = new Subject() { Code = s.Code, Title = s.Title };
+            _context.Subjects.Add(subject);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch { return new ConflictResult(); }
+            return subject;
         }
     }
 }

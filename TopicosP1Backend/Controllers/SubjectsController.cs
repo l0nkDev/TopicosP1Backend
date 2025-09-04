@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
+using System.Text.Json;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -15,32 +16,26 @@ namespace TopicosP1Backend.Controllers
     public class SubjectsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public SubjectsController(Context context)
+        public SubjectsController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         // GET: api/Subjects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Subject.SubjectSimple>>> GetSubjects()
+        public object GetSubjects()
         {
-            var l = await _context.Subjects.ToListAsync();
-            return (from a in l select a.Simple()).ToList();
+            return _queue.Request(Function.GetSubjects, [], "", "GetSubjects", true);
         }
 
         // GET: api/Subjects/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Subject.SubjectSimple>> GetSubject(string id)
+        public object GetSubject(string id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
-
-            if (subject == null)
-            {
-                return NotFound();
-            }
-
-            return subject.Simple();
+            return _queue.Request(Function.GetSubject, [id], "", $"GetSubject {id}", true);
         }
 
         // PUT: api/Subjects/5
@@ -77,27 +72,10 @@ namespace TopicosP1Backend.Controllers
         // POST: api/Subjects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Subject>> PostSubject(Subject.PostSubject s)
+        public object PostSubject(Subject.PostSubject s)
         {
-            Subject subject = new Subject() { Code = s.Code, Title = s.Title };
-            _context.Subjects.Add(subject);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (SubjectExists(subject.Code))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetSubject", new { id = subject.Code }, subject);
+            string b = JsonSerializer.Serialize(s);
+            return _queue.Request(Function.PostSubject, [], b, $"PostSubject {b}");
         }
 
         // DELETE: api/Subjects/5
