@@ -627,7 +627,7 @@ namespace TopicosP1Backend.Scripts
             {
                 new() { FirstName = "Raul", LastName = "Farell Vaca"},
                 new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
-                new() { FirstName = "Joaquin", LastName = "Chumacero" },
+                new() { FirstName = "Joaquin", LastName = "Chumacero Coca" },
             };
             context.Students.AddRange(students);
 
@@ -636,9 +636,9 @@ namespace TopicosP1Backend.Scripts
                 new() { FirstName = "", LastName = ""},
                 new() { FirstName = "Rufino", LastName = ""},
                 new() { FirstName = "Angelica", LastName = "Garzon"},
-                new() { FirstName = "Braulio", LastName = ""},
-                new() { FirstName = "", LastName = "Oropeza"},
-                new() { FirstName = "", LastName = ""},
+                new() { FirstName = "Braulio", LastName = "Caceres"},
+                new() { FirstName = "Elizabeth", LastName = "Oropeza"},
+                new() { FirstName = "", LastName = "Siles"},
             };
             context.Teachers.AddRange(teachers);
 
@@ -692,30 +692,30 @@ namespace TopicosP1Backend.Scripts
 
             var timeslots = new List<TimeSlot>()
             {
-                new() { Day = "Monday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[10], Period = periods[40]}, // Compiladores
-                new() { Day = "Wednesday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[27], Period = periods[40]},
-                new() { Day = "Friday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[10], Period = periods[40]},
-                new() { Day = "Monday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40]}, // Redes I
-                new() { Day = "Wednesday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40]},
-                new() { Day = "Friday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40]},
-                new() { Day = "Tuesday", StartTime = new(7,00), EndTime = new(9,15), Room = rooms[9], Period = periods[40]}, // SI II
-                new() { Day = "Thursday", StartTime = new(7,00), EndTime = new(9,15), Room = rooms[27], Period = periods[40]},
-                new() { Day = "Tuesday", StartTime = new(9,15), EndTime = new(11,30), Room = rooms[3], Period = periods[40]},
-                new() { Day = "Thursday", StartTime = new(9,15), EndTime = new(11,30), Room = rooms[3], Period = periods[40]},
-                new() { Day = "Tuesday", StartTime = new(16,00), EndTime = new(18,15), Room = rooms[28], Period = periods[40]},
-                new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(18,15), Room = rooms[23], Period = periods[40]},
-                new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[28], Period = periods[40]},
-                new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[28], Period = periods[40]},
-                new() { Day = "Tuesday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41]},
-                new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41]},
-                new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[17], Period = periods[41]},
-                new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[25], Period = periods[41]},
-                new() { Day = "Monday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41]},
-                new() { Day = "Wednesday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41]},
-                new() { Day = "Friday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41]},
-                new() { Day = "Monday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41]},
-                new() { Day = "Wednesday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41]},
-                new() { Day = "Friday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41]},
+                new() { Day = "Monday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[10], Period = periods[40], Group = groups[0] }, // Compiladores
+                new() { Day = "Wednesday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[27], Period = periods[40], Group = groups[0]},
+                new() { Day = "Friday", StartTime = new(11,30), EndTime = new(13,00), Room = rooms[10], Period = periods[40], Group = groups[0]},
+                new() { Day = "Monday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40], Group = groups[4]}, // Redes I
+                new() { Day = "Wednesday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40], Group = groups[4]},
+                new() { Day = "Friday", StartTime = new(19,45), EndTime = new(21,15), Room = rooms[1], Period = periods[40], Group = groups[4]},
+                new() { Day = "Tuesday", StartTime = new(7,00), EndTime = new(9,15), Room = rooms[9], Period = periods[40], Group = groups[1]}, // SI II
+                new() { Day = "Thursday", StartTime = new(7,00), EndTime = new(9,15), Room = rooms[27], Period = periods[40], Group = groups[1]},
+                new() { Day = "Tuesday", StartTime = new(9,15), EndTime = new(11,30), Room = rooms[3], Period = periods[40], Group = groups[5]},
+                new() { Day = "Thursday", StartTime = new(9,15), EndTime = new(11,30), Room = rooms[3], Period = periods[40], Group = groups[5]},
+                new() { Day = "Tuesday", StartTime = new(16,00), EndTime = new(18,15), Room = rooms[28], Period = periods[40], Group = groups[2]},
+                new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(18,15), Room = rooms[23], Period = periods[40], Group = groups[2]},
+                new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[28], Period = periods[40], Group = groups[3]},
+                new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[28], Period = periods[40], Group = groups[3]},
+                new() { Day = "Tuesday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41], Group = groups[6]},
+                new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Period = periods[41], Group = groups[6]},
+                new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[17], Period = periods[41], Group = groups[7]},
+                new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[25], Period = periods[41], Group = groups[7]},
+                new() { Day = "Monday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41], Group = groups[8]},
+                new() { Day = "Wednesday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41], Group = groups[8]},
+                new() { Day = "Friday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Period = periods[41], Group = groups[8]},
+                new() { Day = "Monday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41], Group = groups[9]},
+                new() { Day = "Wednesday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41], Group = groups[9]},
+                new() { Day = "Friday", StartTime = new(16,45), EndTime = new(18,15), Room = rooms[24], Period = periods[41], Group = groups[9]},
             };
             context.TimeSlots.AddRange(timeslots);
 
