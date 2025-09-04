@@ -62,6 +62,9 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetStudyPlans: return await GetStudyPlans(context);
                 case Function.GetStudentHistory: return await GetStudentHistory(context, long.Parse(ItemIds[0]));
                 case Function.GetStudentAvailable: return await GetStudentAvailable(context, long.Parse(ItemIds[0]));
+                case Function.GetGestion: return await GetGestion(context, long.Parse(ItemIds[0]));
+                case Function.GetGestions: return await GetGestions(context);
+                case Function.PostGestion: return await PostGestion(context, JsonSerializer.Deserialize<Gestion>(Body));
             }
             return null;
         }
@@ -111,6 +114,12 @@ namespace TopicosP1Backend.Scripts
             var gestion = await context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
             if (gestion == null) return new NotFoundResult();
             return gestion.Simple();
+        }
+        public async Task<ActionResult<Gestion>> PostGestion(Context _context, Gestion gestion)
+        {
+            _context.Gestions.Add(gestion);
+            await _context.SaveChangesAsync();
+            return gestion;
         }
     }
 }

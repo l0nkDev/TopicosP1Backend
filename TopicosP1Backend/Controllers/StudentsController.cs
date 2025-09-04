@@ -49,23 +49,13 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}/history")]
         public object GetStudentHistory(long id)
         {
-            string tranid = Util.Hash("GetStudentHistory " + id.ToString());
-            if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(new QueuedFunction() 
-            { Function=Function.GetStudentHistory, ItemIds = [id.ToString()], Hash=tranid, Body="" });
-            return tranid;
+            return _queue.Request(Function.GetStudentHistory, [id.ToString()], "", $"GetStudentHistory {id}");
         }
 
         [HttpGet("{id}/available")]
         public object GetStudentAvailable(long id)
         {
-            string tranid = Util.Hash("GetStudentAvailable " + id.ToString());
-            if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(new QueuedFunction()
-            { Function = Function.GetStudentAvailable, ItemIds = [id.ToString()], Hash = tranid, Body="" });
-            return tranid;
+            return _queue.Request(Function.GetStudentAvailable, [id.ToString()], "", $"GetStudentAvailable {id}");
         }
 
         // PUT: api/Students/5

@@ -33,14 +33,23 @@ namespace TopicosP1Backend.Scripts
                 CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
                 _context.QueuedFunctions.Add(action.ToDBItem());
                 _context.SaveChanges();
-                q.Enqueue(action);
+                q.Enqueue(action);  
             }
         }
         public void AddResponse(string id, object obj) { responses.Add(id, obj); queued.Remove(id); }
         public object Get(string id, bool delete) { object obj = responses[id]; if (delete) responses.Remove(id); return obj; }
         public string? IsQueued(string id) => queued.Contains(id) ? id : null;
         public int Count() => q.Count;
-        public QueuedFunction Dequeue() => q.Dequeue();
+        public QueuedFunction? Dequeue() { try { return q.Dequeue(); } catch { return null; } }
         public void Enqueue(QueuedFunction func) => q.Enqueue(func);
+        public object Request(Function function, List<string> itemIds, string body, string hashtarget)
+        {
+            string tranid = Util.Hash(hashtarget);
+            if (IsQueued(tranid) != null) return tranid;
+            try { return Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
+            Add(new QueuedFunction()
+            { Function = function, ItemIds = itemIds, Hash = tranid, Body = body });
+            return tranid;
+        }
     }
 }

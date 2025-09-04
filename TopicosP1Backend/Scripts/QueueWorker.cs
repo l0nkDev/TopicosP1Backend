@@ -1,29 +1,19 @@
-﻿using CareerApi.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Policy;
-using System.Text.Json;
-using System.Threading;
-using TopicosP1Backend.Cache;
+﻿using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
 {
 
-    public class QueueWorker : BackgroundService
+    public class QueueWorker : BackgroundService, IQueueWorkerStopper
     {
         private readonly IServiceScopeFactory scopeFactory;
         private readonly APIQueue _queue;
+        private bool running = true;
 
-        public QueueWorker(IServiceScopeFactory scopeFactory, APIQueue queue)
+        public QueueWorker(IServiceScopeFactory scopeFactory, APIQueue aPIQueue)
         {
             this.scopeFactory = scopeFactory;
-            _queue = queue;
-            IServiceScope? scope = scopeFactory.CreateScope();
-            var cache = scope.ServiceProvider.GetService<CacheContext>();
-            List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
-            foreach (QueuedFunction.DBItem item in saved) _queue.Enqueue(item.ToQueueItem());
-            scope?.Dispose(); scope = null; cache = null;
-            ExecuteAsync(new CancellationToken());
+            _queue = aPIQueue;
+            ExecuteAsync(default);
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -32,10 +22,11 @@ namespace TopicosP1Backend.Scripts
                 IServiceScope? scope = null;
                 Context? context = null;
                 CacheContext? cache = null;
-                while (!stoppingToken.IsCancellationRequested)
+                QueuedFunction? a = null;
+                while (running && !stoppingToken.IsCancellationRequested)
                 {
-                    Console.WriteLine("Running!");
-                    if (_queue.Count() != 0)
+                    Console.WriteLine($"Running {this.GetHashCode()}");
+                    if (_queue.Count() != 0 && (a = _queue.Dequeue()) != null)
                     {
                         if (scope == null)
                         {
@@ -43,7 +34,6 @@ namespace TopicosP1Backend.Scripts
                             context = scope.ServiceProvider.GetService<Context>();
                             cache = scope.ServiceProvider.GetService<CacheContext>();
                         }
-                        QueuedFunction a = _queue.Dequeue();
                         var exiting = cache.QueuedFunctions.First();
                         object res = await a.Execute(context);
                         cache.QueuedFunctions.Remove(exiting);
@@ -52,7 +42,10 @@ namespace TopicosP1Backend.Scripts
                     }
                     else { scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken); }
                 }
+                scope?.Dispose(); scope = null;
             });
         }
+        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping {this.GetHashCode()}"); }
+        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default);  }
     }
 }

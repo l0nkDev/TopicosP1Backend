@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
+using System.Collections;
+using System.Text.Json;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -15,37 +17,31 @@ namespace TopicosP1Backend.Controllers
     public class GestionsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public GestionsController(Context context)
+        public GestionsController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         // GET: api/Gestions
         [HttpGet]
-        public async Task<IEnumerable<Gestion.GestionDTO>> GetGestions()
+        public async Task<object> GetGestions()
         {
-            var l = await _context.Gestions.ToListAsync();
-            return from a in l select a.Simple();
+            return _queue.Request(Function.GetGestions, [], "", $"GetGestions");
         }
 
         // GET: api/Gestions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gestion.GestionDTO>> GetGestion(long id)
+        public async Task<object> GetGestion(long id)
         {
-            var gestion = await _context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
-
-            if (gestion == null)
-            {
-                return NotFound();
-            }
-
-            return gestion.Simple();
+            return _queue.Request(Function.GetGestion, [id.ToString()], "", $"GetGestion {id}");
         }
 
-        // PUT: api/Gestions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+            // PUT: api/Gestions/5
+            // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+            [HttpPut("{id}")]
         public async Task<IActionResult> PutGestion(long id, Gestion gestion)
         {
             if (id != gestion.Year)
@@ -77,12 +73,10 @@ namespace TopicosP1Backend.Controllers
         // POST: api/Gestions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Gestion>> PostGestion(Gestion gestion)
+        public object PostGestion(Gestion gestion)
         {
-            _context.Gestions.Add(gestion);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetGestion", new { id = gestion.Year }, gestion);
+            string b = JsonSerializer.Serialize(gestion);
+            return _queue.Request(Function.PostGestion, [], b, $"PostGestion {b}");
         }
 
         // DELETE: api/Gestions/5
