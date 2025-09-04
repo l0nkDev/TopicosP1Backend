@@ -25,9 +25,9 @@ namespace TopicosP1Backend.Scripts
                 QueuedFunction? a = null;
                 while (running && !stoppingToken.IsCancellationRequested)
                 {
-                    Console.WriteLine($"Running {this.GetHashCode()}");
                     if (_queue.Count() != 0 && (a = _queue.Dequeue()) != null)
                     {
+                        Console.WriteLine($"Running Worker {this.GetHashCode()}");
                         if (scope == null)
                         {
                             scope = scopeFactory.CreateScope();
@@ -42,10 +42,11 @@ namespace TopicosP1Backend.Scripts
                     }
                     else { scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken); }
                 }
-                scope?.Dispose(); scope = null;
+                Console.WriteLine($"Idling Worker {this.GetHashCode()}");
+                scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken);
             });
         }
-        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping {this.GetHashCode()}"); return; }
-        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default); Console.WriteLine($"Starting {this.GetHashCode()}"); return; }
+        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping Worker {this.GetHashCode()}"); return; }
+        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default); Console.WriteLine($"Starting Worker {this.GetHashCode()}"); return; }
     }
 }
