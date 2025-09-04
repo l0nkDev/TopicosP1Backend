@@ -45,7 +45,7 @@ namespace TopicosP1Backend.Scripts
                 scope?.Dispose(); scope = null;
             });
         }
-        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping {this.GetHashCode()}"); }
-        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default);  }
+        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping {this.GetHashCode()}"); return; }
+        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default); Console.WriteLine($"Starting {this.GetHashCode()}"); return; }
     }
 }
