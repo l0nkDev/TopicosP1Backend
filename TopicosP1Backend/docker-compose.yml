@@ -4,3 +4,14 @@
     image: topicosp1backend:latest
     ports: 
       - "32002:8080"
+    depends_on:
+      - "redis_image"
+    links:
+      - "redis_image"
+   
+  redis_image:
+    image: redis
+    container_name: cache
+    ports:
+      - "6379:6379"
+    

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
 using System.Collections;
+using System.Security.Policy;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -51,7 +52,8 @@ namespace TopicosP1Backend.Controllers
             int tranid = ("GetStudentHistory " + id.ToString()).GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(() => _queue.GetStudentHistory(id, tranid));
+            _queue.Add(new QueuedFunction() 
+            { Function=Function.GetStudentHistory, Args = [id], Hash=tranid });
             return tranid;
         }
 
@@ -61,7 +63,8 @@ namespace TopicosP1Backend.Controllers
             int tranid = ("GetStudentAvailable " + id.ToString()).GetHashCode();
             if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(() => _queue.GetStudentAvailable(id, tranid));
+            _queue.Add(new QueuedFunction()
+            { Function = Function.GetStudentAvailable, Args = [id], Hash = tranid });
             return tranid;
         }
 

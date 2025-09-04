@@ -413,7 +413,6 @@ namespace TopicosP1Backend.Scripts
                 new() { Prerequisite = subjects[63], Postrequisite = subjects[71], StudyPlan = studyplans[2] },
                 new() { Prerequisite = subjects[64], Postrequisite = subjects[71], StudyPlan = studyplans[2] },
                 new() { Prerequisite = subjects[65], Postrequisite = subjects[71], StudyPlan = studyplans[2] },
-
             };
             context.SubjectDependencies.AddRange(prerequisites);
 
