@@ -27,11 +27,11 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetStudyPlans()
         {
-            int tranid = "GetStudyPlans".GetHashCode();
+            string tranid = Util.Hash("GetStudyPlans");
             if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(new QueuedFunction()
-            { Function = Function.GetStudyPlans, Args = [], Hash = tranid });
+            { Function = Function.GetStudyPlans, ItemIds = [], Hash = tranid, Body="" });
             return tranid;
         }
 
@@ -39,11 +39,11 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}")]
         public object GetStudyPlan(string id)
         {
-            int tranid = ("GetStudyPlan " + id.ToString()).GetHashCode();
+            string tranid = Util.Hash("GetStudyPlan " + id.ToString());
             if (_queue.IsQueued(tranid) != null) return tranid;
             try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
             _queue.Add(new QueuedFunction()
-            { Function = Function.GetStudyPlan, Args = [id], Hash = tranid });
+            { Function = Function.GetStudyPlan, ItemIds = [id.ToString()], Hash = tranid, Body = "" });
             return tranid;
         }
 

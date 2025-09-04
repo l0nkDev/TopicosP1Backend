@@ -10,41 +10,47 @@ namespace TopicosP1Backend.Scripts
     public enum Function
     {
         GetStudyPlan, GetStudyPlans,
-        GetStudentHistory, GetStudentAvailable
+        GetStudentHistory, GetStudentAvailable,
+        GetGestion, GetGestions, PostGestion
     }
 
     public class QueuedFunction
     {
-        required public int Hash { get; set; }
+        required public string Hash { get; set; }
         required public Function Function { get; set; }
-        required public List<object> Args { get; set; }
+        required public List<string> ItemIds { get; set; }
+        required public string Body { get; set; }
         public DBItem ToDBItem() => new(this);
         public class DBItem
         {
             public long Id { get; set; }
-            public int Hash { get; set; }
+            public string Hash { get; set; }
             public int Function { get; set; }
-            public string Args { get; set; }
+            public string ItemIds { get; set; }
+            public string Body { get; set; }
             public QueuedFunction ToQueueItem() => new()
             {
                 Hash = Hash,
                 Function = (Function)Function,
-                Args = JsonSerializer.Deserialize<List<object>>(Args) 
+                ItemIds = JsonSerializer.Deserialize<List<string>>(ItemIds),
+                Body = Body 
             };
 
             public DBItem(QueuedFunction qf)
             {
                 Hash = qf.Hash;
                 Function = (int)qf.Function;
-                Args = JsonSerializer.Serialize(qf.Args);
+                ItemIds = JsonSerializer.Serialize(qf.ItemIds);
+                Body = qf.Body;
             }
 
             [JsonConstructor]
-            public DBItem(int Hash, int Function, string Args) 
+            public DBItem(string Hash, int Function, string ItemIds, string Body) 
             {
                 this.Hash = Hash;
                 this.Function = Function;
-                this.Args = Args;
+                this.ItemIds = ItemIds;
+                this.Body = Body;
             }
         }
 
@@ -52,10 +58,10 @@ namespace TopicosP1Backend.Scripts
         {
             switch (Function)
             {
-                case Function.GetStudyPlan: return await GetStudyPlan(context, (string)Args[0]);
+                case Function.GetStudyPlan: return await GetStudyPlan(context, ItemIds[0]);
                 case Function.GetStudyPlans: return await GetStudyPlans(context);
-                case Function.GetStudentHistory: return await GetStudentHistory(context, (long)Args[0]);
-                case Function.GetStudentAvailable: return await GetStudentAvailable(context, (long)Args[0]);
+                case Function.GetStudentHistory: return await GetStudentHistory(context, long.Parse(ItemIds[0]));
+                case Function.GetStudentAvailable: return await GetStudentAvailable(context, long.Parse(ItemIds[0]));
             }
             return null;
         }
@@ -93,6 +99,18 @@ namespace TopicosP1Backend.Scripts
                 if (sp.Subject.Prerequisites.All(_ => passed.Contains(_))) available.Add(sp.Subject);
             var res = (from a in available.Except(passed).Distinct().ToList() select a.WithGroups()).ToList();
             return res;
+        }
+        public async Task<IEnumerable<Gestion.GestionDTO>> GetGestions(Context context)
+        {
+            var l = await context.Gestions.ToListAsync();
+            return from a in l select a.Simple();
+        }
+
+        public async Task<ActionResult<Gestion.GestionDTO>> GetGestion(Context context, long id)
+        {
+            var gestion = await context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
+            if (gestion == null) return new NotFoundResult();
+            return gestion.Simple();
         }
     }
 }

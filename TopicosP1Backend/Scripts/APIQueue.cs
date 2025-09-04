@@ -13,8 +13,8 @@ namespace TopicosP1Backend.Scripts
     {
         private readonly IServiceScopeFactory scopeFactory;
         private Queue<QueuedFunction> q = [];
-        private HashSet<int> queued = new HashSet<int>();
-        private Dictionary<int, object> responses = [];
+        private HashSet<string> queued = new HashSet<string>();
+        private Dictionary<string, object> responses = [];
 
         public APIQueue(IServiceScopeFactory scopeFactory)
         {
@@ -36,9 +36,9 @@ namespace TopicosP1Backend.Scripts
                 q.Enqueue(action);
             }
         }
-        public void AddResponse(int id, object obj) { responses.Add(id, obj); queued.Remove(id); }
-        public object Get(int id, bool delete) { object obj = responses[id]; if (delete) responses.Remove(id); return obj; }
-        public int? IsQueued(int id) => queued.Contains(id) ? id : null;
+        public void AddResponse(string id, object obj) { responses.Add(id, obj); queued.Remove(id); }
+        public object Get(string id, bool delete) { object obj = responses[id]; if (delete) responses.Remove(id); return obj; }
+        public string? IsQueued(string id) => queued.Contains(id) ? id : null;
         public int Count() => q.Count;
         public QueuedFunction Dequeue() => q.Dequeue();
         public void Enqueue(QueuedFunction func) => q.Enqueue(func);

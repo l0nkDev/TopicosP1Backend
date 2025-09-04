@@ -2,6 +2,8 @@ using CareerApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Text;
 using TopicosP1Backend.Controllers;
 
 namespace TopicosP1Backend.Scripts
@@ -776,7 +778,16 @@ namespace TopicosP1Backend.Scripts
 
     public class Util
     {
-        static public int Hash(string s) { return s.Select(a => (int)a).Sum(); }
+        static public string Hash(string s) 
+        {
+            using (SHA256 sha256hash = SHA256.Create())
+            {
+                byte[] bytes = sha256hash.ComputeHash(Encoding.UTF8.GetBytes(s));
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes) builder.Append(b.ToString("x2"));
+                return builder.ToString();
+            }
+        }
         static public string GenToken() { return string.Join("", Enumerable.Repeat(0, 100).Select(n => (char)new Random().Next(32, 127))).Replace("/", "").Replace(" ", "").Replace("\\", "").Replace("\"", "").Replace("'", ""); }
     }
 

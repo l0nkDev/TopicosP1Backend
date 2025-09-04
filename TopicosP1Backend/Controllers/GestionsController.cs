@@ -25,7 +25,7 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Gestion.GestionDTO>> GetGestions()
         {
-            var l = await _context.Gestions.Include(_ => _.Periods).ToListAsync();
+            var l = await _context.Gestions.ToListAsync();
             return from a in l select a.Simple();
         }
 
@@ -33,7 +33,7 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Gestion.GestionDTO>> GetGestion(long id)
         {
-            var gestion = await _context.Gestions.Include(_ => _.Periods).FirstOrDefaultAsync(_ => _.Year == id);
+            var gestion = await _context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
 
             if (gestion == null)
             {
