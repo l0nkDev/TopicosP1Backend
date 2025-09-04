@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
+using TopicosP1Backend.Scripts;
 
 namespace CareerApi.Models
 {
@@ -31,6 +34,26 @@ namespace CareerApi.Models
         {
             public long Id { get; set; } = period.Id;
             public long Number { get; set; } = period.Number;
+        }
+        public static async Task<ActionResult<IEnumerable<PeriodDTO>>> GetAll(Context _context)
+        {
+            var periods = await _context.Periods.ToListAsync();
+            return (from a in periods select a.Simple()).ToList();
+        }
+        public static async Task<ActionResult<PeriodDTO>> Get(Context _context, long id)
+        {
+            var period = await _context.Periods.FindAsync(id);
+            if (period == null) return new NotFoundResult();
+            return period.Simple();
+        }
+        public static async Task<ActionResult<Period>> Post(Context _context, PostDTO period)
+        {
+            Gestion? g = await _context.Gestions.FindAsync(period.Gestion);
+            if (g == null) { g = new() { Year = period.Gestion }; _context.Gestions.Add(g); }
+            Period p = new() { Id = period.Id, Number = period.Number, Gestion = g };
+            _context.Periods.Add(p);
+            await _context.SaveChangesAsync();
+            return new OkResult();
         }
     }
 }
