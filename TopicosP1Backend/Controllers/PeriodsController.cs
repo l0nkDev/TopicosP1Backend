@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.Json;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -16,32 +17,26 @@ namespace TopicosP1Backend.Controllers
     public class PeriodsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public PeriodsController(Context context)
+        public PeriodsController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         // GET: api/Periods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Period.PeriodDTO>>> GetPeriods()
+        public object GetPeriods()
         {
-            var periods = await _context.Periods.ToListAsync();
-            return (from a in periods select a.Simple()).ToList();
+            return _queue.Request(Function.GetPeriods, [], "", "GetPeriods", true);
         }
 
         // GET: api/Periods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Period.PeriodDTO>> GetPeriod(long id)
+        public object GetPeriod(long id)
         {
-            var period = await _context.Periods.FindAsync(id);
-
-            if (period == null)
-            {
-                return NotFound();
-            }
-
-            return period.Simple();
+            return _queue.Request(Function.GetPeriod, [$"{id}"], "", $"GetPeriod {id}", true);
         }
 
         // PUT: api/Periods/5
@@ -81,14 +76,10 @@ namespace TopicosP1Backend.Controllers
         // POST: api/Periods
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Period>> PostPeriod(Period.PostDTO period)
+        public object PostPeriod(Period.PostDTO period)
         {
-            Gestion? g = await _context.Gestions.FindAsync(period.Gestion);
-            if (g == null) { g = new() { Year = period.Gestion }; _context.Gestions.Add(g); }
-            Period p = new() { Id = period.Id, Number = period.Number, Gestion = g };
-            _context.Periods.Add(p);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetPeriod", new { id = p.Id }, p.Simple());
+            string b = JsonSerializer.Serialize(period);
+            return _queue.Request(Function.PostPeriod, [], b, $"PostPeriod {b}");
         }
 
         // DELETE: api/Periods/5

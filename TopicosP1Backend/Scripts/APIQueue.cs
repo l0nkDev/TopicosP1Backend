@@ -33,6 +33,7 @@ namespace TopicosP1Backend.Scripts
                 CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
                 _context.QueuedFunctions.Add(action.ToDBItem());
                 _context.SaveChanges();
+                queued.Add(action.Hash);
                 q.Enqueue(action);  
             }
         }
@@ -42,11 +43,11 @@ namespace TopicosP1Backend.Scripts
         public int Count() => q.Count;
         public QueuedFunction? Dequeue() { try { return q.Dequeue(); } catch { return null; } }
         public void Enqueue(QueuedFunction func) => q.Enqueue(func);
-        public object Request(Function function, List<string> itemIds, string body, string hashtarget)
+        public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false)
         {
             string tranid = Util.Hash(hashtarget);
             if (IsQueued(tranid) != null) return tranid;
-            try { return Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
+            try { return Get(tranid, delete); } catch { Console.WriteLine("Failed!"); }
             Add(new QueuedFunction()
             { Function = function, ItemIds = itemIds, Hash = tranid, Body = body });
             return tranid;

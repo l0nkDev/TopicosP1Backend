@@ -29,14 +29,14 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public async Task<object> GetGestions()
         {
-            return _queue.Request(Function.GetGestions, [], "", $"GetGestions");
+            return _queue.Request(Function.GetGestions, [], "", $"GetGestions", true);
         }
 
         // GET: api/Gestions/5
         [HttpGet("{id}")]
         public async Task<object> GetGestion(long id)
         {
-            return _queue.Request(Function.GetGestion, [id.ToString()], "", $"GetGestion {id}");
+            return _queue.Request(Function.GetGestion, [id.ToString()], "", $"GetGestion {id}", true);
         }
 
             // PUT: api/Gestions/5

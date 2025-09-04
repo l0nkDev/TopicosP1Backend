@@ -28,10 +28,21 @@ namespace CareerApi.Models
             public IEnumerable<SubjectSimple> Postrequisites { get; set; } = from a in subject.PostDependencies select a.Prerequisite.Simple();
         }
 
-        public class SubjectSimple(Subject subject)
+        public class SubjectSimple
         {
-            public string Code { get; set; } = subject.Code;
-            public string Title { get; set; } = subject.Title;
+            public string Code { get; set; }
+            public string Title { get; set; }
+            public SubjectSimple(Subject subject)
+            {
+                Code = subject.Code;
+                Title = subject.Title;
+            }
+        }
+
+        public class PostSubject
+        {
+            public string Code { get; set; }
+            public string Title { get; set; }
         }
 
         public class SubjectWithGroups(Subject subject)

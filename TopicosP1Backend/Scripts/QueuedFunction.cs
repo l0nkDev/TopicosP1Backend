@@ -11,7 +11,8 @@ namespace TopicosP1Backend.Scripts
     {
         GetStudyPlan, GetStudyPlans,
         GetStudentHistory, GetStudentAvailable,
-        GetGestion, GetGestions, PostGestion
+        GetGestion, GetGestions, PostGestion,
+        PostPeriod, GetPeriods, GetPeriod
     }
 
     public class QueuedFunction
@@ -65,6 +66,9 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetGestion: return await GetGestion(context, long.Parse(ItemIds[0]));
                 case Function.GetGestions: return await GetGestions(context);
                 case Function.PostGestion: return await PostGestion(context, JsonSerializer.Deserialize<Gestion>(Body));
+                case Function.GetPeriod: return await GetPeriod(context, long.Parse(ItemIds[0]));
+                case Function.GetPeriods: return await GetPeriods(context);
+                case Function.PostPeriod: return await PostPeriod(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
             }
             return null;
         }
@@ -120,6 +124,31 @@ namespace TopicosP1Backend.Scripts
             _context.Gestions.Add(gestion);
             await _context.SaveChangesAsync();
             return gestion;
+        }
+        public async Task<ActionResult<IEnumerable<Period.PeriodDTO>>> GetPeriods(Context _context)
+        {
+            var periods = await _context.Periods.ToListAsync();
+            return (from a in periods select a.Simple()).ToList();
+        }
+        public async Task<ActionResult<Period.PeriodDTO>> GetPeriod(Context _context, long id)
+        {
+            var period = await _context.Periods.FindAsync(id);
+
+            if (period == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return period.Simple();
+        }
+        public async Task<ActionResult<Period>> PostPeriod(Context _context, Period.PostDTO period)
+        {
+            Gestion? g = await _context.Gestions.FindAsync(period.Gestion);
+            if (g == null) { g = new() { Year = period.Gestion }; _context.Gestions.Add(g); }
+            Period p = new() { Id = period.Id, Number = period.Number, Gestion = g };
+            _context.Periods.Add(p);
+            await _context.SaveChangesAsync();
+            return new OkResult();
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
@@ -27,24 +22,14 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetStudyPlans()
         {
-            string tranid = Util.Hash("GetStudyPlans");
-            if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(new QueuedFunction()
-            { Function = Function.GetStudyPlans, ItemIds = [], Hash = tranid, Body="" });
-            return tranid;
+            return _queue.Request(Function.GetStudyPlans, [], "", "GetStudyPlans", true);
         }
 
         // GET: api/StudyPlans/5
         [HttpGet("{id}")]
         public object GetStudyPlan(string id)
         {
-            string tranid = Util.Hash("GetStudyPlan " + id.ToString());
-            if (_queue.IsQueued(tranid) != null) return tranid;
-            try { return _queue.Get(tranid, true); } catch { Console.WriteLine("Failed!"); }
-            _queue.Add(new QueuedFunction()
-            { Function = Function.GetStudyPlan, ItemIds = [id.ToString()], Hash = tranid, Body = "" });
-            return tranid;
+            return _queue.Request(Function.GetStudyPlan, [$"{id}"], "", $"GetStudyPlan {id}", true);
         }
 
         // PUT: api/StudyPlans/5

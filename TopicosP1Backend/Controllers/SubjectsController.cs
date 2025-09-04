@@ -23,14 +23,15 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Subjects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Subject>>> GetSubjects()
+        public async Task<ActionResult<IEnumerable<Subject.SubjectSimple>>> GetSubjects()
         {
-            return await _context.Subjects.ToListAsync();
+            var l = await _context.Subjects.ToListAsync();
+            return (from a in l select a.Simple()).ToList();
         }
 
         // GET: api/Subjects/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Subject>> GetSubject(string id)
+        public async Task<ActionResult<Subject.SubjectSimple>> GetSubject(string id)
         {
             var subject = await _context.Subjects.FindAsync(id);
 
@@ -39,7 +40,7 @@ namespace TopicosP1Backend.Controllers
                 return NotFound();
             }
 
-            return subject;
+            return subject.Simple();
         }
 
         // PUT: api/Subjects/5
@@ -76,8 +77,9 @@ namespace TopicosP1Backend.Controllers
         // POST: api/Subjects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Subject>> PostSubject(Subject subject)
+        public async Task<ActionResult<Subject>> PostSubject(Subject.PostSubject s)
         {
+            Subject subject = new Subject() { Code = s.Code, Title = s.Title };
             _context.Subjects.Add(subject);
             try
             {
