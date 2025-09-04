@@ -11,7 +11,9 @@ namespace TopicosP1Backend.Scripts
     {
         GetStudyPlan, GetStudyPlans,
         GetStudentHistory, GetStudentAvailable,
-        GetGestion, GetGestions, PostGestion
+        GetGestion, GetGestions, PostGestion,
+        PostPeriod, GetPeriods, GetPeriod,
+        GetSubject, GetSubjects, PostSubject
     }
 
     public class QueuedFunction
@@ -33,7 +35,7 @@ namespace TopicosP1Backend.Scripts
                 Hash = Hash,
                 Function = (Function)Function,
                 ItemIds = JsonSerializer.Deserialize<List<string>>(ItemIds),
-                Body = Body 
+                Body = Body
             };
 
             public DBItem(QueuedFunction qf)
@@ -45,7 +47,7 @@ namespace TopicosP1Backend.Scripts
             }
 
             [JsonConstructor]
-            public DBItem(string Hash, int Function, string ItemIds, string Body) 
+            public DBItem(string Hash, int Function, string ItemIds, string Body)
             {
                 this.Hash = Hash;
                 this.Function = Function;
@@ -58,68 +60,21 @@ namespace TopicosP1Backend.Scripts
         {
             switch (Function)
             {
-                case Function.GetStudyPlan: return await GetStudyPlan(context, ItemIds[0]);
-                case Function.GetStudyPlans: return await GetStudyPlans(context);
-                case Function.GetStudentHistory: return await GetStudentHistory(context, long.Parse(ItemIds[0]));
-                case Function.GetStudentAvailable: return await GetStudentAvailable(context, long.Parse(ItemIds[0]));
-                case Function.GetGestion: return await GetGestion(context, long.Parse(ItemIds[0]));
-                case Function.GetGestions: return await GetGestions(context);
-                case Function.PostGestion: return await PostGestion(context, JsonSerializer.Deserialize<Gestion>(Body));
+                case Function.GetStudyPlan: return await StudyPlan.Get(context, ItemIds[0]);
+                case Function.GetStudyPlans: return await StudyPlan.GetAll(context);
+                case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
+                case Function.GetStudentAvailable: return await Student.Available(context, long.Parse(ItemIds[0]));
+                case Function.GetGestion: return await Gestion.Get(context, long.Parse(ItemIds[0]));
+                case Function.GetGestions: return await Gestion.GetAll(context);
+                case Function.PostGestion: return await Gestion.Post(context, JsonSerializer.Deserialize<Gestion>(Body));
+                case Function.GetPeriod: return await Period.Get(context, long.Parse(ItemIds[0]));
+                case Function.GetPeriods: return await Period.GetAll(context);
+                case Function.PostPeriod: return await Period.Post(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
+                case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
+                case Function.GetSubjects: return await Subject.GetAll(context);
+                case Function.PostSubject: return await Subject.Post(context, JsonSerializer.Deserialize<Subject.PostSubject>(Body));
             }
             return null;
-        }
-        private static async Task<ActionResult<StudyPlan.StudyPlanDTO>> GetStudyPlan(Context context, string id)
-        {
-            var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
-            if (studyPlan == null) return new NotFoundResult();
-            StudyPlan.StudyPlanDTO res = new(studyPlan);
-            return res;
-        }
-        private static async Task<IEnumerable<StudyPlan.StudyPlanDTO>> GetStudyPlans(Context context)
-        {
-            var db = await context.StudyPlans.ToListAsync();
-            var studyplans = from sp in db select new StudyPlan.StudyPlanDTO(sp);
-            return studyplans;
-        }
-
-        private static async Task<ActionResult<List<StudentGroups.HistoryEntry>>> GetStudentHistory(Context context, long id)
-        {
-            var student = await context.Students.FindAsync(id);
-            if (student == null) { return new NotFoundResult(); }
-            var history = await context.StudentGroups.Where(_ => _.Student.Id == id && _.Status != 2).ToListAsync();
-            List<StudentGroups.HistoryEntry> res = [.. (from a in history select a.Simple())];
-            return res;
-        }
-
-        private static async Task<ActionResult<List<Subject.SubjectWithGroups>>> GetStudentAvailable(Context context, long id)
-        {
-            var student = await context.Students.FirstAsync(_ => _.Id == id);
-            if (student == null) { return new NotFoundResult(); }
-            var spsubjects = (from sp in student.StudyPlans select sp.SpSubjects).SelectMany(_ => _).ToList();
-            var passed = (from sub in student.StudentGroups where sub.Grade >= 51 && sub.Status == 1 select sub.Group.Subject).ToList();
-            List<Subject> available = new List<Subject>();
-            foreach (var sp in spsubjects)
-                if (sp.Subject.Prerequisites.All(_ => passed.Contains(_))) available.Add(sp.Subject);
-            var res = (from a in available.Except(passed).Distinct().ToList() select a.WithGroups()).ToList();
-            return res;
-        }
-        public async Task<IEnumerable<Gestion.GestionDTO>> GetGestions(Context context)
-        {
-            var l = await context.Gestions.ToListAsync();
-            return from a in l select a.Simple();
-        }
-
-        public async Task<ActionResult<Gestion.GestionDTO>> GetGestion(Context context, long id)
-        {
-            var gestion = await context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
-            if (gestion == null) return new NotFoundResult();
-            return gestion.Simple();
-        }
-        public async Task<ActionResult<Gestion>> PostGestion(Context _context, Gestion gestion)
-        {
-            _context.Gestions.Add(gestion);
-            await _context.SaveChangesAsync();
-            return gestion;
         }
     }
 }

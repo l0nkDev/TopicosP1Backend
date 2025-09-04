@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using TopicosP1Backend.Scripts;
 using static CareerApi.Models.Subject;
 
 namespace CareerApi.Models
@@ -20,6 +23,19 @@ namespace CareerApi.Models
             public string Career { get; set; } = studyPlan.Career.Name;
             public IEnumerable<SpSubject.SpSubjectDTO> Subjects { get; set; } = 
                 from a in studyPlan.SpSubjects select a.SimpleList();
+        }
+        public static async Task<ActionResult<StudyPlanDTO>> Get(Context context, string id)
+        {
+            var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
+            if (studyPlan == null) return new NotFoundResult();
+            StudyPlan.StudyPlanDTO res = new(studyPlan);
+            return res;
+        }
+        public static async Task<IEnumerable<StudyPlanDTO>> GetAll(Context context)
+        {
+            var db = await context.StudyPlans.ToListAsync();
+            var studyplans = from sp in db select new StudyPlanDTO(sp);
+            return studyplans;
         }
     }
 }
