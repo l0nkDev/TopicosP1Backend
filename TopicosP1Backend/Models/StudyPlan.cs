@@ -75,7 +75,7 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PutSubject(Context context, string id, string sub, StudyPlanSubjectPost spsub)
         {
-            var sps = await context.SpSubjects.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
+            var sps = await context.SpSubjects.IgnoreAutoIncludes().Include(_=>_.Subject).FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
             sps.Level = spsub.Level; sps.Credits = spsub.Credits; sps.Type = spsub.Type;
             context.Entry(sps).State = EntityState.Modified;

@@ -20,7 +20,21 @@ namespace CareerApi.Models
             public Period.PeriodDTO Period { get; set; } = ins.Period.Simple();
             public DateTime DateTime { get; set; } = ins.DateTime;
             public int Type { get; set; } = ins.Type;
-            public List<Group.GroupDTO> Groups = (from i in ins.Groups select i.Simple()).ToList();
+            public List<Group.GroupDTO> Groups { get; set; } = (from i in ins.Groups select i.Simple()).ToList();
+        }
+
+        public class InscriptionPost
+        {
+            public long Id { get; set; }
+            public long Student { get; set; }
+            public long Period { get; set; }
+            public long Gestion { get; set; }
+            public int Type { get; set; }
+
+        }
+        public class GIPost
+        {
+            required public long Group { get; set; }
         }
     }
 }
