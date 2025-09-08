@@ -23,9 +23,10 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Inscriptions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Inscription>>> GetInscriptions()
+        public async Task<ActionResult<IEnumerable<Inscription.InscriptionDTO>>> GetInscriptions()
         {
-            return await _context.Inscriptions.ToListAsync();
+            List<Inscription> l = await _context.Inscriptions.IgnoreAutoIncludes().Include(_=>_.Student).Include(_=>_.Period).ThenInclude(_=>_.Gestion).Include(_=>_.Groups).ThenInclude(_=>_.Subject).ToListAsync();
+            return (from i in l select i.Simple()).ToList();
         }
 
         // GET: api/Inscriptions/5

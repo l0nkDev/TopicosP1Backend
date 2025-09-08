@@ -23,9 +23,10 @@ namespace TopicosP1Backend.Controllers
 
         // GET: api/Rooms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
+        public async Task<ActionResult<IEnumerable<Room.RoomDTO>>> GetRooms()
         {
-            return await _context.Rooms.ToListAsync();
+            var l = await _context.Rooms.ToListAsync();
+            return (from i in l select i.Simple()).ToList();
         }
 
         // GET: api/Rooms/5

@@ -21,11 +21,23 @@ namespace CareerApi.Models
         public class GroupDTO(Group group)
         {
             public long Id { get; set; } = group.Id;
+            public Subject.SubjectSimple Subject { get; set; } = group.Subject.Simple();
             public string Code { get; set; } = group.Code;
             public string Mode { get; set; } = group.Mode;
             public long Quota { get; set; } = group.Quota;
-            public string Period { get; set; } = group.Period.Number.ToString() + "-" + group.Period.Gestion.Year.ToString();
-            public string Teacher { get; set; } = group.Teacher.FirstName + " " + group.Teacher.LastName;
+            public Period.PeriodDTO Period { get; set; } = group.Period.Simple();
+            public Teacher.TeacherDTO Teacher { get; set; } = group.Teacher.Simple();
+        }
+        public class PostGroup
+        {
+            required public long Id { get; set; }
+            required public string Subject { get; set; }
+            required public string Code { get; set; }
+            required public string Mode { get; set; }
+            required public long Quota { get; set; }
+            required public long Period { get; set; }
+            required public long Gestion { get; set; }
+            required public long Teacher { get; set; }
         }
     }
 }

@@ -11,8 +11,9 @@ namespace CareerApi.Models
 
         public class RoomDTO(Room room)
         {
-            public long id = room.Id;
-            public long number = room.Number;
+            public long Id { get; set; } = room.Id;
+            public long Number { get; set; } = room.Number;
+            public long Module { get; set; } = room.Module.Number;
         }
     }
 }

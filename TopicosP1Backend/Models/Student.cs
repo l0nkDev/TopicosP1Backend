@@ -14,6 +14,13 @@ namespace CareerApi.Models
         public IEnumerable<StudyPlan> StudyPlans { get; set; } = new List<StudyPlan>();
         public IEnumerable<StudentGroups> StudentGroups { get; set; } = new List<StudentGroups>();
         public IEnumerable<Group> Groups { get; set; } = new List<Group>();
+        public StudentDTO Simple() => new(this);
+        public class StudentDTO(Student s)
+        {
+            public long Id { get; set; } = s.Id;
+            public string FirstName { get; set; } = s.FirstName;
+            public string LastName { get; set; } = s.LastName;
+        }
 
         public static async Task<ActionResult<List<StudentGroups.HistoryEntry>>> History(Context context, long id)
         {
