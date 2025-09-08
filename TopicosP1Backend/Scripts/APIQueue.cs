@@ -1,10 +1,4 @@
-﻿using CareerApi.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Policy;
-using System.Text.Json;
-using System.Threading;
-using TopicosP1Backend.Cache;
+﻿using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
 {

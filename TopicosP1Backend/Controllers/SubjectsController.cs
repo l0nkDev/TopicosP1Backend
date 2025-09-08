@@ -24,55 +24,25 @@ namespace TopicosP1Backend.Controllers
             _queue = queue;
         }
 
-        // GET: api/Subjects
         [HttpGet]
         public object GetSubjects()
         {
             return _queue.Request(Function.GetSubjects, [], "", "GetSubjects", true);
         }
 
-        // GET: api/Subjects/5
         [HttpGet("{id}")]
         public object GetSubject(string id)
         {
             return _queue.Request(Function.GetSubject, [id], "", $"GetSubject {id}", true);
         }
 
-        // PUT: api/Subjects/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSubject(string id, Subject subject)
+        public object PutSubject(string id, Subject.PostSubject s)
         {
-            if (id != subject.Code)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(subject).State = EntityState.Modified;
-
-            try
-            {
-                var oldSubject = await _context.Subjects.FindAsync(id);
-                oldSubject.Title = subject.Title;
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Subjects.Any(e => e.Code == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            string b = JsonSerializer.Serialize(s);
+            return _queue.Request(Function.PutSubject, [id], b, $"PutSubject {id}", true);
         }
 
-        // POST: api/Subjects
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public object PostSubject(Subject.PostSubject s)
         {
@@ -80,16 +50,10 @@ namespace TopicosP1Backend.Controllers
             return _queue.Request(Function.PostSubject, [], b, $"PostSubject {b}");
         }
 
-        // DELETE: api/Subjects/5
         [HttpDelete("{id}")]
         public object DeleteSubject(string id)
         {
             return _queue.Request(Function.DeleteSubject, [id], "", $"DeleteSubject {id}");
-        }
-
-        private bool SubjectExists(string id)
-        {
-            return _context.Subjects.Any(e => e.Code == id);
         }
     }
 }

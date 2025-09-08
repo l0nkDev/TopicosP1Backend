@@ -9,7 +9,9 @@ namespace TopicosP1Backend.Scripts
 {
     public enum Function
     {
-        GetStudyPlan, GetStudyPlans, PostStudyPlan, PutStudyPlan, DeleteStudyPlan,
+        GetStudyPlan, GetStudyPlans, PostStudyPlan, PutStudyPlan, DeleteStudyPlan, 
+        GetStudyPlanSubjects, PostStudyPlanSubject, PutStudyPlanSubject, DeleteStudyPlanSubject,
+        GetStudyPlanSubjectDeps, PostStudyPlanSubjectDep, DeleteStudyPlanSubjectDep,
         GetGestion, GetGestions, PostGestion, PutGestion, DeleteGestion,
         GetPeriod, GetPeriods, PostPeriod, PutPeriod, DeletePeriod,
         GetSubject, GetSubjects, PostSubject, PutSubject, DeleteSubject,
@@ -62,6 +64,13 @@ namespace TopicosP1Backend.Scripts
             {
                 case Function.GetStudyPlan: return await StudyPlan.Get(context, ItemIds[0]);
                 case Function.GetStudyPlans: return await StudyPlan.GetAll(context);
+                case Function.GetStudyPlanSubjects: return await StudyPlan.GetSubjects(context, ItemIds[0]);
+                case Function.PostStudyPlanSubject: return await StudyPlan.PostSubject(context, ItemIds[0], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
+                case Function.PutStudyPlanSubject: return await StudyPlan.PutSubject(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
+                case Function.DeleteStudyPlanSubject: return await StudyPlan.DeleteSubject(context, ItemIds[0], ItemIds[1]);
+                case Function.GetStudyPlanSubjectDeps: return await StudyPlan.GetSubjectDeps(context, ItemIds[0], ItemIds[1]);
+                case Function.PostStudyPlanSubjectDep: return await StudyPlan.PostSubjectDep(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.SPSDependency>(Body));
+                case Function.DeleteStudyPlanSubjectDep: return await StudyPlan.DeleteSubjectDep(context, ItemIds[0], ItemIds[1], ItemIds[2]);
                 case Function.GetGestion: return await Gestion.Get(context, long.Parse(ItemIds[0]));
                 case Function.GetGestions: return await Gestion.GetAll(context);
                 case Function.PostGestion: return await Gestion.Post(context, JsonSerializer.Deserialize<Gestion>(Body));
@@ -71,6 +80,7 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
                 case Function.GetSubjects: return await Subject.GetAll(context);
                 case Function.PostSubject: return await Subject.Post(context, JsonSerializer.Deserialize<Subject.PostSubject>(Body));
+                case Function.PutSubject: return await Subject.Put(context, ItemIds[0], JsonSerializer.Deserialize<Subject.PostSubject>(Body));
                 case Function.DeleteSubject: return await Subject.Delete(context, ItemIds[0]);
                 case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
                 case Function.GetStudentAvailable: return await Student.Available(context, long.Parse(ItemIds[0]));

@@ -1,8 +1,6 @@
-﻿using CareerApi.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using TopicosP1Backend.Scripts;
 
 namespace CareerApi.Models
@@ -83,6 +81,21 @@ namespace CareerApi.Models
             if (subject == null) return new NotFoundResult();
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
+            return new NoContentResult();
+        }
+        public static async Task<IActionResult> Put(Context _context, string id, PostSubject s)
+        {
+            if (id != s.Code) return new BadRequestResult();
+            Subject subject = await _context.Subjects.FindAsync(id);
+            subject.Title = s.Title;
+            _context.Entry(subject).State = EntityState.Modified;
+
+            try { await _context.SaveChangesAsync(); }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Subjects.Any(e => e.Code == id)) return new NotFoundResult();
+                else throw;
+            }
             return new NoContentResult();
         }
     }

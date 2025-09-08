@@ -87,7 +87,8 @@ namespace TopicosP1Backend.Scripts
             modelBuilder.Entity<Group>().Navigation(_ => _.Teacher).AutoInclude();
             modelBuilder.Entity<Group>().Navigation(_ => _.Period).AutoInclude();
             modelBuilder.Entity<Period>().Navigation(_ => _.Gestion).AutoInclude();
-            //modelBuilder.Entity<Gestion>().Navigation(_ => _.Periods).AutoInclude();
+            modelBuilder.Entity<Career>().Navigation(_ => _.StudyPlans).AutoInclude();
+            modelBuilder.Entity<SpSubject>().Navigation(_ => _.Subject).AutoInclude();
         }
     }
 

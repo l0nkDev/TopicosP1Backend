@@ -15,5 +15,11 @@ namespace CareerApi.Models
             public string Name { get; set; } = career.Name;
             public IEnumerable<StudyPlanDTO> StudyPlans { get; } = from a in career.StudyPlans select a.Simple();
         }
+
+        public class PostCareer
+        {
+            public long Id { get; set; }
+            required public string Name { get; set; }
+        }
     }
 }
