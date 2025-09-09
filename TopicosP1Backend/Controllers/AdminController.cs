@@ -25,10 +25,27 @@ namespace TopicosP1Backend.Controllers
         }
 
         [HttpGet("Queues")]
-        public async Task<IActionResult> GetQueues()
+        public async Task<ActionResult<List<Queue<QueuedFunction>>>> GetQueues()
         {
-            _stopper.StartAsync();
-            return Ok();
+            return _queue.GetQueues();
+        }
+
+        [HttpGet("Queues/{id}")]
+        public async Task<ActionResult<Queue<QueuedFunction>>> GetQueue(int id)
+        {
+            return _queue.GetQueue(id);
+        }
+
+        [HttpGet("Queues/SetCountTo/{id}")]
+        public async void SetCountTo(int id)
+        {
+            _queue.SetQueuesCount(id);
+        }
+
+        [HttpGet("Transaction/{id}")]
+        public async Task<ActionResult<object>> GetTransaction(string id)
+        {
+            return _queue.getTranStatus(id);
         }
     }
 }

@@ -99,5 +99,32 @@ namespace TopicosP1Backend.Scripts
             { Queue = queues.IndexOf(Emptier()) ,Function = function, ItemIds = itemIds, Hash = tranid, Body = body });
             return tranid;
         }
+
+        public List<Queue<QueuedFunction>> GetQueues() => queues;
+        public Queue<QueuedFunction> GetQueue(int id) => queues[id];
+        public void SetQueuesCount(int n)
+        {
+            if (queues.Count == n) return;
+            if (queues.Count > n) while (queues.Count > n) queues.Remove(Emptier());
+            if (queues.Count < n) while (queues.Count < n) queues.Add(new());
+        }
+
+        public object getTranStatus(string id)
+        {
+            try { return new { Status = "Done", Result = responses[id] }; } catch { }
+            bool isInQueue = false;
+            QueuedFunction? tmp = null;
+            foreach (var q in queues)
+            {
+                tmp = q.ToList().FirstOrDefault(_ => _.Hash == id);
+                if (tmp != null)
+                {
+                    isInQueue = true;
+                    break;
+                }
+            }
+            if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
+            return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
+        }
     }
 }
