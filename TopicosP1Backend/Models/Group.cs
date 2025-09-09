@@ -110,13 +110,13 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<List<TimeSlot.TimeSlotDTO>>> GetTimeSlots(Context _context, long id)
         {
-            Group g = await _context.Groups.FindAsync(id);
+            Group g = await _context.Groups.Include(_=>_.TimeSlots).ThenInclude(_ => _.Room).ThenInclude(_ => _.Module).FirstOrDefaultAsync(_=>_.Id == id);
             return (from i in g.TimeSlots select i.Simple()).ToList();
         }
 
         public static async Task<ActionResult<TimeSlot.TimeSlotDTO>> PostTimeSlot(Context _context, long id, TimeSlot.TimeSlotPost body)
         {
-            Room room = await _context.Rooms.FirstOrDefaultAsync(_ => _.Number == body.Room && _.Module.Number == body.Module);
+            Room room = await _context.Rooms.Include(_=>_.Module).FirstOrDefaultAsync(_ => _.Number == body.Room && _.Module.Number == body.Module);
             Group group = await _context.Groups.FindAsync(id);
             if (room == null || group == null) return new NotFoundResult();
             TimeSlot g = new()
@@ -135,7 +135,7 @@ namespace CareerApi.Models
         public static async Task<ActionResult<TimeSlot.TimeSlotDTO>> PutTimeSlot(Context _context, long id, long ts, TimeSlot.TimeSlotPost body)
         {
             TimeSlot timeslot = await _context.TimeSlots.FindAsync(ts);
-            Room room = await _context.Rooms.FirstOrDefaultAsync(_ => _.Number == body.Room && _.Module.Number == body.Module);
+            Room room = await _context.Rooms.Include(_=>_.Module).FirstOrDefaultAsync(_ => _.Number == body.Room && _.Module.Number == body.Module);
             Group group = await _context.Groups.FindAsync(id);
             if (room == null || group == null || timeslot == null) return new NotFoundResult();
             timeslot.Day = body.Day;

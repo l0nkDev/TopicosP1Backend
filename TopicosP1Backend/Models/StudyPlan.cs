@@ -74,7 +74,9 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<StudyPlanDTO>> PostStudyPlan(Context _context, StudyPlanPost c)
         {
-            StudyPlan sp = new StudyPlan { Code = c.Code, Career = await _context.Careers.FindAsync(c.Career) };
+            Career? carr = await _context.Careers.FindAsync(c.Career);
+            if (carr == null) return new NotFoundResult();
+            StudyPlan sp = new StudyPlan { Code = c.Code, Career = carr};
             _context.StudyPlans.Add(sp);
             await _context.SaveChangesAsync();
             return sp.Simple();

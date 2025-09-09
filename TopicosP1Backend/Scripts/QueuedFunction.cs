@@ -12,8 +12,10 @@ namespace TopicosP1Backend.Scripts
         GetTimeSlots, PostTimeSlot, PutTimeSlot, DeleteTimeSlot,//
         GetInscriptions, PostInscription, GetInscription, PutInscription, DeleteInscription,// 
         GetInsGroups, PostInsGroup, DeleteInsGroup,//
+        GetModules, PostModule, GetModule, DeleteModule,//
+        GetModRooms, PostModRoom, DeleteModRoom,//
         GetPeriods, PostPeriod, GetPeriod, PutPeriod, DeletePeriod,//
-        GetStudents, PostStudent, GetStudent, PutStudent, DeleteStudent,
+        GetStudents, PostStudent, GetStudent, PutStudent, DeleteStudent,//
         GetStudentHistory, GetStudentAvaliables,//
         GetStudyPlans, PostStudyPlan, GetStudyPlan, PutStudyPlan, DeleteStudyPlan,//
         GetSpSubjects, PostSpSubject, PutSpSubject, DeleteSpSubject,//
@@ -100,17 +102,31 @@ namespace TopicosP1Backend.Scripts
                 case Function.PostInsGroup: return await Inscription.PostInsGroups(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Inscription.GIPost>(Body));
                 case Function.DeleteInsGroup: return await Inscription.DeleteInsGroups(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
 
+                case Function.GetModules: return await Module.GetModules(context);
+                case Function.PostModule: return await Module.PostModule(context, JsonSerializer.Deserialize<Module.ModulePost>(Body));
+                case Function.GetModule: return await Module.GetModule(context, long.Parse(ItemIds[0]));
+                case Function.DeleteModule: return await Module.DeleteModule(context, long.Parse(ItemIds[0]));
+
+                case Function.GetModRooms: return await Module.GetModRooms(context, long.Parse(ItemIds[0]));
+                case Function.PostModRoom: return await Module.PostModRoom(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Module.ModulePost>(Body));
+                case Function.DeleteModRoom: return await Module.DeleteModRoom(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
+
                 case Function.GetPeriods: return await Period.GetPeriods(context);
                 case Function.PostPeriod: return await Period.PostPeriod(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
                 case Function.GetPeriod: return await Period.GetPeriod(context, long.Parse(ItemIds[0]));
                 case Function.DeletePeriod: return await Period.DeletePeriod(context, long.Parse(ItemIds[0]));
 
+                case Function.GetStudents: return await Student.GetStudents(context);
+                case Function.PostStudent: return await Student.PostStudent(context, JsonSerializer.Deserialize<Student.StudentPost>(Body));
+                case Function.GetStudent: return await Student.GetStudent(context, long.Parse(ItemIds[0]));
+                case Function.PutStudent: return await Student.PutStudent(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Student.StudentPost>(Body));
+                case Function.DeleteStudent: return await Student.DeleteStudent(context, long.Parse(ItemIds[0]));
                 case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
                 case Function.GetStudentAvaliables: return await Student.Available(context, long.Parse(ItemIds[0]));
 
                 case Function.GetStudyPlans: return await StudyPlan.GetStudyPlans(context);
-                case Function.GetStudyPlan: return await StudyPlan.GetStudyPlan(context, ItemIds[0]);
                 case Function.PostStudyPlan: return await StudyPlan.PostStudyPlan(context, JsonSerializer.Deserialize<StudyPlan.StudyPlanPost>(Body));
+                case Function.GetStudyPlan: return await StudyPlan.GetStudyPlan(context, ItemIds[0]);
                 case Function.PutStudyPlan: return await StudyPlan.PutStudyPlan(context, ItemIds[0], JsonSerializer.Deserialize<StudyPlan.StudyPlanPost>(Body));
                 case Function.DeleteStudyPlan: return await StudyPlan.DeleteStudyPlan(context, ItemIds[0]);
 

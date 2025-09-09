@@ -46,14 +46,14 @@ namespace CareerApi.Models
             if (period == null) return new NotFoundResult();
             return period.Simple();
         }
-        public static async Task<ActionResult<Period>> PostPeriod(Context _context, PostDTO period)
+        public static async Task<ActionResult<PeriodDTO>> PostPeriod(Context _context, PostDTO period)
         {
             Gestion? g = await _context.Gestions.FindAsync(period.Gestion);
             if (g == null) { g = new() { Year = period.Gestion }; _context.Gestions.Add(g); }
             Period p = new() { Id = period.Id, Number = period.Number, Gestion = g };
             _context.Periods.Add(p);
             await _context.SaveChangesAsync();
-            return new OkResult();
+            return p.Simple();
         }
         public static async Task<IActionResult> DeletePeriod(Context _context, long id)
         {

@@ -5,24 +5,10 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminController(IQueueWorkerStopper stopper, APIQueue queue) : ControllerBase
+    public class AdminController(APIQueue queue, WorkerManager manager) : ControllerBase
     {
-        private readonly IQueueWorkerStopper _stopper = stopper;
         private readonly APIQueue _queue = queue;
-
-        [HttpGet("Stop")]
-        public async Task<IActionResult> Stop()
-        {
-            _stopper.StopAsync();
-            return Ok();
-        }
-
-        [HttpGet("Start")]
-        public async Task<IActionResult> Start()
-        {
-            _stopper.StartAsync();
-            return Ok();
-        }
+        private readonly WorkerManager _manager = manager;
 
         [HttpGet("Queues")]
         public async Task<ActionResult<List<Queue<QueuedFunction>>>> GetQueues()
@@ -40,6 +26,38 @@ namespace TopicosP1Backend.Controllers
         public async void SetCountTo(int id)
         {
             _queue.SetQueuesCount(id);
+        }
+
+        [HttpGet("Workers")]
+        public async Task<object> GetWorkers()
+        {
+            return _manager.GetWorkers();
+        }
+
+        [HttpGet("Workers/{id}")]
+        public async Task<object> GetWorker(int id)
+        {
+            return _manager.GetWorker(id);
+        }
+
+        [HttpGet("Workers/{id}/Start")]
+        public async Task<object> StartWorker(int id)
+        {
+            _manager.Start(id);
+            return new OkResult();
+        }
+
+        [HttpGet("Workers/{id}/Stop")]
+        public async Task<object> StopWorker(int id)
+        {
+            _manager.Stop(id);
+            return new OkResult();
+        }
+
+        [HttpGet("Workers/SetCountTo/{id}")]
+        public async void WSetCountTo(int id)
+        {
+            _manager.SetCountTo(id);
         }
 
         [HttpGet("Transaction/{id}")]

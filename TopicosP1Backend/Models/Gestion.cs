@@ -26,13 +26,13 @@ namespace CareerApi.Models
         }
         public static async Task<IEnumerable<GestionDTO>> GetGestions(Context context)
         {
-            var l = await context.Gestions.ToListAsync();
+            var l = await context.Gestions.Include(_=>_.Periods).ToListAsync();
             return from a in l select a.Simple();
         }
 
-        public static async Task<ActionResult<Gestion.GestionDTO>> GetGestion(Context context, long id)
+        public static async Task<ActionResult<GestionDTO>> GetGestion(Context context, long id)
         {
-            var gestion = await context.Gestions.FirstOrDefaultAsync(_ => _.Year == id);
+            var gestion = await context.Gestions.Include(_ => _.Periods).FirstOrDefaultAsync(_ => _.Year == id);
             if (gestion == null) return new NotFoundResult();
             return gestion.Simple();
         }

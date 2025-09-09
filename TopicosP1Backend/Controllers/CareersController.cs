@@ -28,7 +28,7 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetCareers()
         {
-            return _queue.Request(Function.GetCareer, [], "", $"GetCareers", true);
+            return _queue.Request(Function.GetCareers, [], "", $"GetCareers", true);
         }
 
         [HttpGet("{id}")]

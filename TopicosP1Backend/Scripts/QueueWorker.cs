@@ -3,17 +3,18 @@
 namespace TopicosP1Backend.Scripts
 {
 
-    public class QueueWorker : BackgroundService, IQueueWorkerStopper
+    public class QueueWorker : BackgroundService
     {
         private readonly IServiceScopeFactory scopeFactory;
         private readonly APIQueue _queue;
-        private bool running = true;
+        public string Status = "";
+        private CancellationTokenSource cts = new();
 
         public QueueWorker(IServiceScopeFactory scopeFactory, APIQueue aPIQueue)
         {
             this.scopeFactory = scopeFactory;
             _queue = aPIQueue;
-            ExecuteAsync(default);
+            Start();
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -23,11 +24,12 @@ namespace TopicosP1Backend.Scripts
                 Context? context = null;
                 CacheContext? cache = null;
                 QueuedFunction? a = null;
-                while (running && !stoppingToken.IsCancellationRequested)
+                while (!stoppingToken.IsCancellationRequested)
                 {
                     if (_queue.Count() != 0 && (a = _queue.Dequeue()) != null)
                     {
                         Console.WriteLine($"Running Worker {this.GetHashCode()}");
+                        Status = "Running";
                         if (scope == null)
                         {
                             scope = scopeFactory.CreateScope();
@@ -40,13 +42,18 @@ namespace TopicosP1Backend.Scripts
                         cache.SaveChanges();
                         _queue.AddResponse(a.Hash, res);
                     }
-                    else { scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken); }
+                    else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Delay(1000, stoppingToken); }
                 }
-                Console.WriteLine($"Idling Worker {this.GetHashCode()}");
                 scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken);
             });
         }
-        void IQueueWorkerStopper.StopAsync() { running = false; Console.WriteLine($"Stopping Worker {this.GetHashCode()}"); return; }
-        void IQueueWorkerStopper.StartAsync() { running = true; ExecuteAsync(default); Console.WriteLine($"Starting Worker {this.GetHashCode()}"); return; }
+        public async void Stop()
+        {
+            cts.Cancel(); await StopAsync(cts.Token); cts.Dispose();  Status = "Stopped";
+        }
+        public async void Start()
+        {
+            cts = new(); await StartAsync(cts.Token);
+        }
     }
 }

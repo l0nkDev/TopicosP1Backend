@@ -33,7 +33,6 @@ namespace CareerApi.Models
             return (from i in l select i.Simple()).ToList();
         }
 
-        [HttpGet("{id}")]
         public static async Task<ActionResult<StudentDTO>> GetStudent(Context _context, long id)
         {
             var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == id);
