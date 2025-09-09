@@ -2,6 +2,11 @@
 
 namespace TopicosP1Backend.Scripts
 {
+    public class wcount
+    {
+        public long Id { get; set; }
+        required public int Count { get; set; }
+    }
 
     public class WorkerManager: IHostedService
     {
@@ -12,7 +17,11 @@ namespace TopicosP1Backend.Scripts
         {
             _queue = queue;
             _scopeFactory = scope;
-            //_workers.Add(new(_scopeFactory, _queue));
+            _workers.Add(new(_scopeFactory, _queue));
+            CacheContext c = scope.CreateScope().ServiceProvider.GetService<CacheContext>();
+            wcount wc = c.wcounts.FirstOrDefault();
+            if (wc == null) { wc = new() { Count = 1 }; c.wcounts.Add(wc); c.SaveChanges(); }
+            SetCountTo(wc.Count);
         }
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -23,6 +32,11 @@ namespace TopicosP1Backend.Scripts
         public void SetCountTo(int n)
         {
             if (n == _workers.Count) return;
+            CacheContext c = _scopeFactory.CreateScope().ServiceProvider.GetService<CacheContext>();
+            wcount wc = c.wcounts.First();
+            wc.Count = n;
+            c.Entry(wc).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            c.SaveChanges();
             if (n > _workers.Count) while (n > _workers.Count) _workers.Add(new(_scopeFactory, _queue));
             if (n < _workers.Count) while (n < _workers.Count) { var w = _workers.Last(); _workers.Remove(w); w.Stop(); w.Dispose(); }
         }

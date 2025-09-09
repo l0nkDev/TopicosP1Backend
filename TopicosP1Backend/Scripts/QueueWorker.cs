@@ -52,7 +52,7 @@ namespace TopicosP1Backend.Scripts
         }
         public async void Stop()
         {
-            cts.Cancel(); await StopAsync(cts.Token); cts.Dispose();  Status = "Stopped";
+            if (cts == null) return; cts.Cancel(); await StopAsync(cts.Token); cts.Dispose();  cts = null; Status = "Stopped";
         }
         public async void Start()
         {
