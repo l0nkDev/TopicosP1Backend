@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CareerApi.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using TopicosP1Backend.Scripts;
 
 namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminController(IQueueWorkerStopper stopper) : ControllerBase
+    public class AdminController(IQueueWorkerStopper stopper, APIQueue queue) : ControllerBase
     {
         private readonly IQueueWorkerStopper _stopper = stopper;
+        private readonly APIQueue _queue = queue;
 
         [HttpGet("Stop")]
         public async Task<IActionResult> Stop()
@@ -25,6 +19,13 @@ namespace TopicosP1Backend.Controllers
 
         [HttpGet("Start")]
         public async Task<IActionResult> Start()
+        {
+            _stopper.StartAsync();
+            return Ok();
+        }
+
+        [HttpGet("Queues")]
+        public async Task<IActionResult> GetQueues()
         {
             _stopper.StartAsync();
             return Ok();

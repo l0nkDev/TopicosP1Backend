@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using CareerApi.Models;
 using TopicosP1Backend.Scripts;
+using System.Text.Json;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -15,121 +10,63 @@ namespace TopicosP1Backend.Controllers
     public class InscriptionsController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public InscriptionsController(Context context)
+        public InscriptionsController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
-        // GET: api/Inscriptions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Inscription.InscriptionDTO>>> GetInscriptions()
+        public object GetInscriptions()
         {
-            List<Inscription> l = await _context.Inscriptions.IgnoreAutoIncludes().Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Subject)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Teacher)
-                .ToListAsync();
-            return (from i in l select i.Simple()).ToList();
+            return _queue.Request(Function.GetInscriptions, [], "", "GetInscriptions", true);
         }
 
-        // GET: api/Inscriptions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Inscription.InscriptionDTO>> GetInscription(long id)
+        public object GetInscription(long id)
         {
-            var inscription = await _context.Inscriptions.IgnoreAutoIncludes().Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Subject)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Teacher)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)
-                .FirstOrDefaultAsync(_=>_.Id == id);
-
-            if (inscription == null)
-            {
-                return NotFound();
-            }
-
-            return inscription.Simple();
+            return _queue.Request(Function.GetInscription, [$"{id}"], "", $"GetInscription {id}", true);
         }
 
-        // PUT: api/Inscriptions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<Inscription.InscriptionDTO>> PutInscription(long id, Inscription.InscriptionPost i)
+        public object PutInscription(long id, Inscription.InscriptionPost i)
         {
-            var inscription = await _context.Inscriptions.FindAsync(id);
-            var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_=>_.Id == i.Student);
-            var period = await _context.Periods.FirstOrDefaultAsync(_=>_.Number == i.Period && _.Gestion.Year == i.Gestion);
-            if (inscription == null || student == null || period == null) return new NotFoundResult();
-            if (id != inscription.Id) return new BadRequestResult();
-            inscription.Student = student;
-            inscription.Period = period;
-            inscription.Type = i.Type;
-            _context.Entry(inscription).State = EntityState.Modified;
-            _context.SaveChanges();
-            return inscription.Simple();
+            string b = JsonSerializer.Serialize(i);
+            return _queue.Request(Function.PutInscription, [$"{id}"], b, $"PutInscription {id} {b}");
         }
 
-        // POST: api/Inscriptions
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Inscription>> PostInscription(Inscription.InscriptionPost i)
+        public object PostInscription(Inscription.InscriptionPost i)
         {
-            var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == i.Student);
-            var period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == i.Period && _.Gestion.Year == i.Gestion);
-            Inscription n = new() { Student = student, Period = period, DateTime = DateTime.Now, Type = i.Type };
-            _context.Inscriptions.Add(n);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetInscription", new { id = n.Id }, n.Simple());
+            string b = JsonSerializer.Serialize(i);
+            return _queue.Request(Function.PostInscription, [], b, $"PostInscription {b}");
         }
 
-        // DELETE: api/Inscriptions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInscription(long id)
+        public object DeleteInscription(long id)
         {
-            var inscription = await _context.Inscriptions.FindAsync(id);
-            if (inscription == null)
-            {
-                return NotFound();
-            }
-
-            _context.Inscriptions.Remove(inscription);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return _queue.Request(Function.DeleteInscription, [$"{id}"], "", $"DeleteInscription {id}");
         }
 
-        // GET: api/Inscriptions/5
         [HttpGet("{id}/Groups")]
-        public async Task<ActionResult<List<Group.GroupDTO>>> GetGroups(long id)
+        public object GetInsGroups(long id)
         {
-            var inscription = await _context.Inscriptions.IgnoreAutoIncludes().Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Subject)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Teacher)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)
-                .FirstOrDefaultAsync(_ => _.Id == id);
-            if (inscription == null) return NotFound();
-            return inscription.Simple().Groups.ToList();
+            return _queue.Request(Function.GetInsGroups, [$"{id}"], "", $"GetInsGroups {id}");
         }
 
-        // GET: api/Inscriptions/5
         [HttpPost("{id}/Groups")]
-        public async Task<ActionResult<List<Group.GroupDTO>>> PostGroups(long id, Inscription.GIPost body)
+        public object PostInsGroup(long id, Inscription.GIPost body)
         {
-            var inscription = await _context.Inscriptions.FirstOrDefaultAsync(_ => _.Id == id);
-            Group group = await _context.Groups.FindAsync(body.Group);
-            if (inscription == null || group == null) return new NotFoundResult();
-            GroupInscription gi = new() { Group = group, Inscription = inscription };
-            await _context.GroupInscriptions.AddAsync(gi);
-            await _context.SaveChangesAsync();
-            return new OkResult();
+            string b = JsonSerializer.Serialize(body);
+            return _queue.Request(Function.PostInsGroup, [$"{id}"], b, $"PostInsGroup {id} {b}");
         }
 
-        // GET: api/Inscriptions/5
         [HttpDelete("{id}/Groups/{group}")]
-        public async Task<ActionResult<List<Group.GroupDTO>>> DeleteGroups(long id, long group)
+        public object DeleteInsGroup(long id, long group)
         {
-            GroupInscription gi = await _context.GroupInscriptions.FirstOrDefaultAsync(_ => _.Group.Id == group && _.Inscription.Id == id);
-            if (gi == null) return new NotFoundResult();
-            _context.GroupInscriptions.Remove(gi);
-            await _context.SaveChangesAsync();
-            return new OkResult();
+            return _queue.Request(Function.DeleteInsGroup, [$"{id}", $"{group}"], "", $"DeleteInsGroup {id} {group}");
         }
     }
 }

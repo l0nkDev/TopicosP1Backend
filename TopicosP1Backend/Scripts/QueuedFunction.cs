@@ -1,7 +1,4 @@
 ﻿using CareerApi.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Drawing.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -9,17 +6,24 @@ namespace TopicosP1Backend.Scripts
 {
     public enum Function
     {
-        GetStudyPlan, GetStudyPlans, PostStudyPlan, PutStudyPlan, DeleteStudyPlan, 
-        GetStudyPlanSubjects, PostStudyPlanSubject, PutStudyPlanSubject, DeleteStudyPlanSubject,
-        GetStudyPlanSubjectDeps, PostStudyPlanSubjectDep, DeleteStudyPlanSubjectDep,
-        GetGestion, GetGestions, PostGestion, PutGestion, DeleteGestion,
-        GetPeriod, GetPeriods, PostPeriod, PutPeriod, DeletePeriod,
-        GetSubject, GetSubjects, PostSubject, PutSubject, DeleteSubject,
-        GetStudentHistory, GetStudentAvailable,
+        GetCareers, PostCareer, GetCareer, PutCareer, DeleteCareer,//
+        GetGestions, PostGestion, GetGestion, DeleteGestion,//
+        GetGroups, PostGroup, GetGroup, PutGroup, DeleteGroup,//
+        GetTimeSlots, PostTimeSlot, PutTimeSlot, DeleteTimeSlot,//
+        GetInscriptions, PostInscription, GetInscription, PutInscription, DeleteInscription,// 
+        GetInsGroups, PostInsGroup, DeleteInsGroup,//
+        GetPeriods, PostPeriod, GetPeriod, PutPeriod, DeletePeriod,//
+        GetStudents, PostStudent, GetStudent, PutStudent, DeleteStudent,
+        GetStudentHistory, GetStudentAvaliables,//
+        GetStudyPlans, PostStudyPlan, GetStudyPlan, PutStudyPlan, DeleteStudyPlan,//
+        GetSpSubjects, PostSpSubject, PutSpSubject, DeleteSpSubject,//
+        GetSpSubDependencies, PostSpSubDependency, DeleteSpSubDependency,//
+        GetSubjects, PostSubject, GetSubject, PutSubject, DeleteSubject,//
     }
 
     public class QueuedFunction
     {
+        required public int Queue { get; set; }
         required public string Hash { get; set; }
         required public Function Function { get; set; }
         required public List<string> ItemIds { get; set; }
@@ -27,6 +31,7 @@ namespace TopicosP1Backend.Scripts
         public DBItem ToDBItem() => new(this);
         public class DBItem
         {
+            public int Queue { get; set; }
             public long Id { get; set; }
             public string Hash { get; set; }
             public int Function { get; set; }
@@ -34,6 +39,7 @@ namespace TopicosP1Backend.Scripts
             public string Body { get; set; }
             public QueuedFunction ToQueueItem() => new()
             {
+                Queue = Queue,
                 Hash = Hash,
                 Function = (Function)Function,
                 ItemIds = JsonSerializer.Deserialize<List<string>>(ItemIds),
@@ -62,28 +68,66 @@ namespace TopicosP1Backend.Scripts
         {
             switch (Function)
             {
-                case Function.GetStudyPlan: return await StudyPlan.Get(context, ItemIds[0]);
-                case Function.GetStudyPlans: return await StudyPlan.GetAll(context);
-                case Function.GetStudyPlanSubjects: return await StudyPlan.GetSubjects(context, ItemIds[0]);
-                case Function.PostStudyPlanSubject: return await StudyPlan.PostSubject(context, ItemIds[0], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
-                case Function.PutStudyPlanSubject: return await StudyPlan.PutSubject(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
-                case Function.DeleteStudyPlanSubject: return await StudyPlan.DeleteSubject(context, ItemIds[0], ItemIds[1]);
-                case Function.GetStudyPlanSubjectDeps: return await StudyPlan.GetSubjectDeps(context, ItemIds[0], ItemIds[1]);
-                case Function.PostStudyPlanSubjectDep: return await StudyPlan.PostSubjectDep(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.SPSDependency>(Body));
-                case Function.DeleteStudyPlanSubjectDep: return await StudyPlan.DeleteSubjectDep(context, ItemIds[0], ItemIds[1], ItemIds[2]);
-                case Function.GetGestion: return await Gestion.Get(context, long.Parse(ItemIds[0]));
-                case Function.GetGestions: return await Gestion.GetAll(context);
-                case Function.PostGestion: return await Gestion.Post(context, JsonSerializer.Deserialize<Gestion>(Body));
-                case Function.GetPeriod: return await Period.Get(context, long.Parse(ItemIds[0]));
-                case Function.GetPeriods: return await Period.GetAll(context);
-                case Function.PostPeriod: return await Period.Post(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
-                case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
+                case Function.GetCareers: return await Career.GetCareers(context);
+                case Function.PostCareer: return await Career.PostCareer(context, JsonSerializer.Deserialize<Career.CareerPost>(Body));
+                case Function.GetCareer: return await Career.GetCareer(context, long.Parse(ItemIds[0]));
+                case Function.PutCareer: return await Career.PutCareer(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Career.CareerPost>(Body));
+                case Function.DeleteCareer: return await Career.DeleteCareer(context, long.Parse(ItemIds[0]));
+
+                case Function.GetGestions: return await Gestion.GetGestions(context);
+                case Function.PostGestion: return await Gestion.PostGestion(context, JsonSerializer.Deserialize<Gestion>(Body));
+                case Function.GetGestion: return await Gestion.GetGestion(context, long.Parse(ItemIds[0]));
+                case Function.DeleteGestion: return await Gestion.DeleteGestion(context, long.Parse(ItemIds[0]));
+
+                case Function.GetGroups: return await Group.GetGroups(context);
+                case Function.PostGroup: return await Group.PostGroup(context, JsonSerializer.Deserialize<Group.GroupPost>(Body));
+                case Function.GetGroup: return await Group.GetGroup(context, long.Parse(ItemIds[0]));
+                case Function.PutGroup: return await Group.PutGroup(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Group.GroupPost>(Body));
+                case Function.DeleteGroup: return await Group.DeleteGroup(context, long.Parse(ItemIds[0]));
+
+                case Function.GetTimeSlots: return await Group.GetTimeSlots(context, long.Parse(ItemIds[0]));
+                case Function.PostTimeSlot: return await Group.PostTimeSlot(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<TimeSlot.TimeSlotPost>(Body));
+                case Function.PutTimeSlot: return await Group.PutTimeSlot(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]), JsonSerializer.Deserialize<TimeSlot.TimeSlotPost>(Body));
+                case Function.DeleteTimeSlot: return await Group.DeleteTimeSlot(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
+
+                case Function.GetInscriptions: return await Inscription.GetInscriptions(context);
+                case Function.PostInscription: return await Inscription.PostInscription(context, JsonSerializer.Deserialize<Inscription.InscriptionPost>(Body));
+                case Function.GetInscription: return await Inscription.GetInscription(context, long.Parse(ItemIds[0]));
+                case Function.PutInscription: return await Inscription.PutInscription(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Inscription.InscriptionPost>(Body));
+                case Function.DeleteInscription: return await Inscription.DeleteInscription(context, long.Parse(ItemIds[0]));
+
+                case Function.GetInsGroups: return await Inscription.GetInsGroups(context, long.Parse(ItemIds[0]));
+                case Function.PostInsGroup: return await Inscription.PostInsGroups(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Inscription.GIPost>(Body));
+                case Function.DeleteInsGroup: return await Inscription.DeleteInsGroups(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
+
+                case Function.GetPeriods: return await Period.GetPeriods(context);
+                case Function.PostPeriod: return await Period.PostPeriod(context, JsonSerializer.Deserialize<Period.PostDTO>(Body));
+                case Function.GetPeriod: return await Period.GetPeriod(context, long.Parse(ItemIds[0]));
+                case Function.DeletePeriod: return await Period.DeletePeriod(context, long.Parse(ItemIds[0]));
+
+                case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
+                case Function.GetStudentAvaliables: return await Student.Available(context, long.Parse(ItemIds[0]));
+
+                case Function.GetStudyPlans: return await StudyPlan.GetStudyPlans(context);
+                case Function.GetStudyPlan: return await StudyPlan.GetStudyPlan(context, ItemIds[0]);
+                case Function.PostStudyPlan: return await StudyPlan.PostStudyPlan(context, JsonSerializer.Deserialize<StudyPlan.StudyPlanPost>(Body));
+                case Function.PutStudyPlan: return await StudyPlan.PutStudyPlan(context, ItemIds[0], JsonSerializer.Deserialize<StudyPlan.StudyPlanPost>(Body));
+                case Function.DeleteStudyPlan: return await StudyPlan.DeleteStudyPlan(context, ItemIds[0]);
+
+                case Function.GetSpSubjects: return await StudyPlan.GetSpSubject(context, ItemIds[0]);
+                case Function.PostSpSubject: return await StudyPlan.PostSpSubject(context, ItemIds[0], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
+                case Function.PutSpSubject: return await StudyPlan.PutSpSubject(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.StudyPlanSubjectPost>(Body));
+                case Function.DeleteSpSubject: return await StudyPlan.DeleteSpSubject(context, ItemIds[0], ItemIds[1]);
+
+                case Function.GetSpSubDependencies: return await StudyPlan.GetSpSubDependencies(context, ItemIds[0], ItemIds[1]);
+                case Function.PostSpSubDependency: return await StudyPlan.PostSpSubDependency(context, ItemIds[0], ItemIds[1], JsonSerializer.Deserialize<StudyPlan.SPSDependency>(Body));
+                case Function.DeleteSpSubDependency: return await StudyPlan.DeleteSpSubDependency(context, ItemIds[0], ItemIds[1], ItemIds[2]);
+
                 case Function.GetSubjects: return await Subject.GetAll(context);
                 case Function.PostSubject: return await Subject.Post(context, JsonSerializer.Deserialize<Subject.PostSubject>(Body));
+                case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
                 case Function.PutSubject: return await Subject.Put(context, ItemIds[0], JsonSerializer.Deserialize<Subject.PostSubject>(Body));
                 case Function.DeleteSubject: return await Subject.Delete(context, ItemIds[0]);
-                case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
-                case Function.GetStudentAvailable: return await Student.Available(context, long.Parse(ItemIds[0]));
             }
             return null;
         }

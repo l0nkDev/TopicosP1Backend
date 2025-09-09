@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CareerApi.Models;
 using static CareerApi.Models.Career;
 using TopicosP1Backend.Scripts;
+using System.Text.Json;
 
 namespace TopicosP1Backend.Controllers
 {
@@ -16,64 +17,44 @@ namespace TopicosP1Backend.Controllers
     public class CareersController : ControllerBase
     {
         private readonly Context _context;
+        private readonly APIQueue _queue;
 
-        public CareersController(Context context)
+        public CareersController(Context context, APIQueue queue)
         {
             _context = context;
+            _queue = queue;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<CareerDTO>> GetCareers()
+        public object GetCareers()
         {
-            var careers = await _context.Careers.ToListAsync();
-            return from a in careers select a.SimpleList();
+            return _queue.Request(Function.GetCareer, [], "", $"GetCareers", true);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CareerDTO>> GetCareer(long id)
+        public object GetCareer(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null) return NotFound();
-            return career.SimpleList();
+            return _queue.Request(Function.GetCareer, [$"{id}"], "", $"GetCareer {id}", true);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCareer(long id, PostCareer c)
+        public object PutCareer(long id, CareerPost c)
         {
-            if (id != c.Id) return new BadRequestResult();
-            Career subject = await _context.Careers.FindAsync(id);
-            subject.Name = c.Name;
-            _context.Entry(subject).State = EntityState.Modified;
-
-            try { await _context.SaveChangesAsync(); }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Careers.Any(e => e.Id == id)) return new NotFoundResult();
-                else throw;
-            }
-            return new NoContentResult();
+            string b = JsonSerializer.Serialize(c);
+            return _queue.Request(Function.PutCareer, [$"{id}"], b, $"PutCareer {id} {b}");
         }
 
-        // POST: api/Careers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Career>> PostCareer(PostCareer c)
+        public object PostCareer(CareerPost c)
         {
-            Career career = new Career { Name = c.Name };
-            _context.Careers.Add(career);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCareer), new { id = career.Id }, career);
+            string b = JsonSerializer.Serialize(c);
+            return _queue.Request(Function.PostCareer, [], b, $"PostCareer {b}");
         }
 
-        // DELETE: api/Careers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCareer(long id)
+        public object DeleteCareer(long id)
         {
-            var career = await _context.Careers.FindAsync(id);
-            if (career == null) return new NotFoundResult();
-            _context.Careers.Remove(career);
-            await _context.SaveChangesAsync();
-            return new NoContentResult();
+            return _queue.Request(Function.DeleteCareer, [$"{id}"], "", $"DeleteCareer {id}", true);
         }
     }
 }

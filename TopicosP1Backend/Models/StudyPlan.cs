@@ -43,27 +43,59 @@ namespace CareerApi.Models
         {
             required public string Code { get; set; }
         }
-        public static async Task<ActionResult<StudyPlanDTO>> Get(Context context, string id)
+        public static async Task<ActionResult<StudyPlanDTO>> GetStudyPlan(Context context, string id)
         {
             var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             StudyPlanDTO res = new(studyPlan);
             return res;
         }
-        public static async Task<IEnumerable<StudyPlanDTO>> GetAll(Context context)
+        public static async Task<IEnumerable<StudyPlanDTO>> GetStudyPlans(Context context)
         {
             var db = await context.StudyPlans.ToListAsync();
             var studyplans = from sp in db select new StudyPlanDTO(sp);
             return studyplans;
         }
-        public static async Task<ActionResult<List<SpSubject.SpSubjectDTO>>> GetSubjects(Context context, string id)
+        public static async Task<IActionResult> PutStudyPlan(Context _context, string id, StudyPlanPost sp)
+        {
+            if (id != sp.Code) return new BadRequestResult();
+            StudyPlan studyplan = await _context.StudyPlans.FindAsync(id);
+            studyplan.Career = await _context.Careers.FindAsync(sp.Career);
+            _context.Entry(studyplan).State = EntityState.Modified;
+
+            try { await _context.SaveChangesAsync(); }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.StudyPlans.Any(e => e.Code == id)) return new NotFoundResult();
+                else throw;
+            }
+            return new NoContentResult();
+        }
+
+        public static async Task<ActionResult<StudyPlanDTO>> PostStudyPlan(Context _context, StudyPlanPost c)
+        {
+            StudyPlan sp = new StudyPlan { Code = c.Code, Career = await _context.Careers.FindAsync(c.Career) };
+            _context.StudyPlans.Add(sp);
+            await _context.SaveChangesAsync();
+            return sp.Simple();
+        }
+
+        public static async Task<IActionResult> DeleteStudyPlan(Context _context, string id)
+        {
+            var sp = await _context.StudyPlans.FindAsync(id);
+            if (sp == null) return new NotFoundResult();
+            _context.StudyPlans.Remove(sp);
+            await _context.SaveChangesAsync();
+            return new NoContentResult();
+        }
+        public static async Task<ActionResult<List<SpSubject.SpSubjectDTO>>> GetSpSubject(Context context, string id)
         {
             var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             var subs = studyPlan.SpSubjects;
             return (from i in subs select i.SimpleList()).ToList();
         }
-        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PostSubject(Context context, string id, StudyPlanSubjectPost spsub)
+        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PostSpSubject(Context context, string id, StudyPlanSubjectPost spsub)
         {
             StudyPlan studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
             Subject subject = await context.Subjects.FindAsync(spsub.Subject);
@@ -73,7 +105,7 @@ namespace CareerApi.Models
             await context.SaveChangesAsync();
             return n.SimpleList();
         }
-        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PutSubject(Context context, string id, string sub, StudyPlanSubjectPost spsub)
+        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PutSpSubject(Context context, string id, string sub, StudyPlanSubjectPost spsub)
         {
             var sps = await context.SpSubjects.IgnoreAutoIncludes().Include(_=>_.Subject).FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
@@ -82,7 +114,7 @@ namespace CareerApi.Models
             await context.SaveChangesAsync();
             return sps.SimpleList();
         }
-        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> DeleteSubject(Context context, string id, string sub)
+        public static async Task<ActionResult<SpSubject.SpSubjectDTO>> DeleteSpSubject(Context context, string id, string sub)
         {
             var sps = await context.SpSubjects.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
@@ -90,14 +122,14 @@ namespace CareerApi.Models
             await context.SaveChangesAsync();
             return new NoContentResult();
         }
-        public static async Task<ActionResult<List<Subject.SubjectSimple>>> GetSubjectDeps(Context context, string id, string sub)
+        public static async Task<ActionResult<List<Subject.SubjectSimple>>> GetSpSubDependencies(Context context, string id, string sub)
         {
             var sps = await context.SpSubjects.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
             var lis = context.SubjectDependencies.Where(_ => _.StudyPlan.Code == id && _.Postrequisite.Code == sub);
             return (from i in lis select i.Prerequisite.Simple()).ToList();
         }
-        public static async Task<ActionResult<Subject.SubjectSimple>> PostSubjectDep(Context context, string id, string sub, SPSDependency dep)
+        public static async Task<ActionResult<Subject.SubjectSimple>> PostSpSubDependency(Context context, string id, string sub, SPSDependency dep)
         {
             var sps = await context.SpSubjects.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             var subject = await context.Subjects.FindAsync(dep.Code);
@@ -108,7 +140,7 @@ namespace CareerApi.Models
             await context.SaveChangesAsync();
             return subject.Simple();
         }
-        public static async Task<ActionResult<Subject.SubjectSimple>> DeleteSubjectDep(Context context, string id, string sub, string pre)
+        public static async Task<ActionResult<Subject.SubjectSimple>> DeleteSpSubDependency(Context context, string id, string sub, string pre)
         {
             var entry = await context.SubjectDependencies.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Prerequisite.Code == pre && i.Postrequisite.Code == sub );
             if (entry == null) return new NotFoundResult();

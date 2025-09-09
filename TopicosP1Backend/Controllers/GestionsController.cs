@@ -45,13 +45,9 @@ namespace TopicosP1Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGestion(long id)
+        public object DeleteGestion(long id)
         {
-            var gestion = await _context.Gestions.FindAsync(id);
-            if (gestion == null) return NotFound();
-            _context.Gestions.Remove(gestion);
-            await _context.SaveChangesAsync();
-            return new NoContentResult();
+            return _queue.Request(Function.DeleteGestion, [$"{id}"], "", $"DeleteGestion {id}");
         }
     }
 }

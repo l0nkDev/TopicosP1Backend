@@ -38,13 +38,9 @@ namespace TopicosP1Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePeriod(long id)
+        public object DeletePeriod(long id)
         {
-            var period = await _context.Periods.FindAsync(id);
-            if (period == null) return NotFound();
-            _context.Periods.Remove(period);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            return _queue.Request(Function.DeletePeriod, [$"{id}"], "", $"DeletePeriod {id}");
         }
     }
 }
