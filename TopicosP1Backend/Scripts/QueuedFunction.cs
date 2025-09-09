@@ -1,4 +1,5 @@
 ﻿using CareerApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -21,6 +22,7 @@ namespace TopicosP1Backend.Scripts
         GetSpSubjects, PostSpSubject, PutSpSubject, DeleteSpSubject,//
         GetSpSubDependencies, PostSpSubDependency, DeleteSpSubDependency,//
         GetSubjects, PostSubject, GetSubject, PutSubject, DeleteSubject,//
+        GetTeachers, PostTeacher, GetTeacher, PutTeacher, DeleteTeacher//
     }
 
     public class QueuedFunction
@@ -144,8 +146,14 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetSubject: return await Subject.Get(context, ItemIds[0]);
                 case Function.PutSubject: return await Subject.Put(context, ItemIds[0], JsonSerializer.Deserialize<Subject.PostSubject>(Body));
                 case Function.DeleteSubject: return await Subject.Delete(context, ItemIds[0]);
+
+                case Function.GetTeachers: return await Teacher.GetTeachers(context);
+                case Function.PostTeacher: return await Teacher.PostTeacher(context, JsonSerializer.Deserialize<Teacher.TeacherPost>(Body));
+                case Function.GetTeacher: return await Teacher.GetTeacher(context, long.Parse(ItemIds[0]));
+                case Function.PutTeacher: return await Teacher.PutTeacher(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Teacher.TeacherPost>(Body));
+                case Function.DeleteTeacher: return await Teacher.DeleteTeacher(context, long.Parse(ItemIds[0]));
             }
-            return null;
+            return new BadRequestResult();
         }
     }
 }
