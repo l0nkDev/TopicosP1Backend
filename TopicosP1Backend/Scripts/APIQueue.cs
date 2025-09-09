@@ -1,4 +1,6 @@
-﻿using TopicosP1Backend.Cache;
+﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
 {
@@ -111,6 +113,19 @@ namespace TopicosP1Backend.Scripts
 
         public object getTranStatus(string id)
         {
+            try 
+            {
+                dynamic r = responses[id];
+                object value = r.Value;
+                if (value != null) return new { Status = "Done", Result = value };
+                int status = r.Result.StatusCode;
+                switch (status)
+                {
+                    case 404: return new { Status = "Done", Result = "404 Not Found" };
+                    case 400: return new { Status = "Done", Result = "400 Bad Request" };
+                }
+                return new { Status = "Done", Result = r };
+            } catch { }
             try { return new { Status = "Done", Result = responses[id] }; } catch { }
             bool isInQueue = false;
             QueuedFunction? tmp = null;
@@ -126,6 +141,13 @@ namespace TopicosP1Backend.Scripts
             if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
             if (queued.Contains(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
             return new { Status = "Not found", Item = "Item is not queued and no result has been saved. ID may be wrong or the result may have already expired." };
+        }
+
+        private static int? GetStatusCode(ActionResult actionResult)
+        {
+            IConvertToActionResult convertToActionResult = (IConvertToActionResult)actionResult;
+            var actionResultWithStatusCode = convertToActionResult.Convert() as IStatusCodeActionResult;
+            return actionResultWithStatusCode?.StatusCode;
         }
     }
 }
