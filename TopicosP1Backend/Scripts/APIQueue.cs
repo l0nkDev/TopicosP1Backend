@@ -124,7 +124,8 @@ namespace TopicosP1Backend.Scripts
                 }
             }
             if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
-            return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
+            if (queued.Contains(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
+            return new { Status = "Not found", Item = "Item is not queued and no result has been saved. ID may be wrong or the result may have already expired." };
         }
     }
 }

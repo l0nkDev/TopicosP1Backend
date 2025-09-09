@@ -1,4 +1,5 @@
-﻿using TopicosP1Backend.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
 {
@@ -36,9 +37,9 @@ namespace TopicosP1Backend.Scripts
                             context = scope.ServiceProvider.GetService<Context>();
                             cache = scope.ServiceProvider.GetService<CacheContext>();
                         }
-                        var exiting = cache.QueuedFunctions.First();
+                        var exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_=>_.Hash == a.Hash);
                         object res = await a.Execute(context);
-                        cache.QueuedFunctions.Remove(exiting);
+                        if (exiting != null) cache.QueuedFunctions.Remove(exiting);
                         cache.SaveChanges();
                         _queue.AddResponse(a.Hash, res);
                     }
