@@ -36,20 +36,20 @@ namespace TopicosP1Backend.Controllers
         public object PutStudyPlan(string id, StudyPlan.StudyPlanPost sp)
         {
             string b = JsonSerializer.Serialize(sp);
-            return _queue.Request(Function.PutStudyPlan, [id], b, $"PutStudyPlan {id} {b}", true);
+            return _queue.Request(Function.PutStudyPlan, [id], b, $"PutStudyPlan {id} {b}");
         }
 
         [HttpPost]
         public object PostStudyPlan(StudyPlan.StudyPlanPost c)
         {
             string b = JsonSerializer.Serialize(c);
-            return _queue.Request(Function.PostStudyPlan, [], b, $"PostStudyPlan {b}", true);
+            return _queue.Request(Function.PostStudyPlan, [], b, $"PostStudyPlan {b}");
         }
 
         [HttpDelete("{id}")]
         public object DeleteStudyPlan(string id)
         {
-            return _queue.Request(Function.DeleteStudyPlan, [id], "", $"DeleteStudyPlan {id}", true);
+            return _queue.Request(Function.DeleteStudyPlan, [id], "", $"DeleteStudyPlan {id}");
         }
 
         [HttpGet("{id}/Subjects")]
@@ -61,19 +61,19 @@ namespace TopicosP1Backend.Controllers
         [HttpPost("{id}/Subjects")]
         public object PostSpSubject(string id, StudyPlan.StudyPlanSubjectPost body)
         {
-            return _queue.Request(Function.PostSpSubject, [id], JsonSerializer.Serialize(body), $"PostSpSubject {id}", true);
+            return _queue.Request(Function.PostSpSubject, [id], JsonSerializer.Serialize(body), $"PostSpSubject {id}");
         }
 
         [HttpPut("{id}/Subjects/{sub}")]
         public object PutSpSubject(string id, string sub, StudyPlan.StudyPlanSubjectPost body)
         {
-            return _queue.Request(Function.PutSpSubject, [id, sub], JsonSerializer.Serialize(body), $"PutSpSubject {id}", true);
+            return _queue.Request(Function.PutSpSubject, [id, sub], JsonSerializer.Serialize(body), $"PutSpSubject {id}");
         }
 
         [HttpDelete("{id}/Subjects/{sub}")]
         public object DeleteSpSubject(string id, string sub)
         {
-            return _queue.Request(Function.DeleteSpSubject, [id, sub], "", $"DeleteSpSubject {id}", true);
+            return _queue.Request(Function.DeleteSpSubject, [id, sub], "", $"DeleteSpSubject {id}");
         }
 
         [HttpGet("{id}/Subjects/{sub}/Dependencies")]
@@ -85,13 +85,13 @@ namespace TopicosP1Backend.Controllers
         [HttpPost("{id}/Subjects/{sub}/Dependencies")]
         public object PostSpSubDependency(string id, string sub, StudyPlan.SPSDependency body)
         {
-            return _queue.Request(Function.PostSpSubDependency, [id, sub], JsonSerializer.Serialize(body), $"PostSpSubDependency {id} {sub}", true);
+            return _queue.Request(Function.PostSpSubDependency, [id, sub], JsonSerializer.Serialize(body), $"PostSpSubDependency {id} {sub}");
         }
 
         [HttpDelete("{id}/Subjects/{sub}/Dependencies/{pre}")]
         public object DeleteSpSubDependency(string id, string sub, string pre)
         {
-            return _queue.Request(Function.DeleteSpSubDependency, [id, sub, pre], "", $"DeleteSpSubDependency {id} {sub}", true);
+            return _queue.Request(Function.DeleteSpSubDependency, [id, sub, pre], "", $"DeleteSpSubDependency {id} {sub}");
         }
     }
 }

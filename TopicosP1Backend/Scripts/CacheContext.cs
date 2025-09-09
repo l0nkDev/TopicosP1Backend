@@ -10,7 +10,8 @@ namespace TopicosP1Backend.Cache
         {
         }
 
-        public DbSet<QueuedFunction.DBItem> QueuedFunctions { get; set; } = default!;
+        public DbSet<QueuedFunction.DBItem> QueuedFunctions { get; set; }
+        public DbSet<qcount> qcounts { get; set; }
     }
 
     public static class Extensions

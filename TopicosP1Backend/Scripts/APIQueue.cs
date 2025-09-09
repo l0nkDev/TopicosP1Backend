@@ -1,9 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using TopicosP1Backend.Cache;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace TopicosP1Backend.Scripts
 {
+    public class qcount
+    {
+        public long Id { get; set; }
+        required public int Count { get; set; }
+    }
     public class APIQueue
     {
         private readonly IServiceScopeFactory scopeFactory;
@@ -15,7 +22,10 @@ namespace TopicosP1Backend.Scripts
         {
             this.scopeFactory = scopeFactory;
             IServiceScope? scope = scopeFactory.CreateScope();
-            var cache = scope.ServiceProvider.GetService<CacheContext>();
+            CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
+            qcount qc = cache.qcounts.FirstOrDefault();
+            if (qc == null) { qc = new() { Count = 1 }; cache.qcounts.Add(qc); cache.SaveChanges(); }
+            SetQueuesCount(qc.Count);
             List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;
@@ -97,6 +107,7 @@ namespace TopicosP1Backend.Scripts
             string tranid = Util.Hash(hashtarget);
             if (IsQueued(tranid) != null) return tranid;
             try { return Get(tranid, delete); } catch { Console.WriteLine("Failed!"); }
+            if (queues.Count == 0) return "No queues available.";
             Add(new QueuedFunction()
             { Queue = queues.IndexOf(Emptier()) ,Function = function, ItemIds = itemIds, Hash = tranid, Body = body });
             return tranid;
@@ -107,7 +118,37 @@ namespace TopicosP1Backend.Scripts
         public void SetQueuesCount(int n)
         {
             if (queues.Count == n) return;
-            if (queues.Count > n) while (queues.Count > n) queues.Remove(Emptier());
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                qcount qc = _context.qcounts.First();
+                qc.Count = n;
+                _context.Entry(qc).State = EntityState.Modified;
+                _context.SaveChanges();
+                if (queues.Count > n)
+                if (n == 0)
+                {
+                    queues = new List<Queue<QueuedFunction>>();
+                    _context.QueuedFunctions.ExecuteDelete();
+                    queued = new HashSet<string>();
+                }
+                while (queues.Count > n)
+                {
+                    Queue<QueuedFunction> q = Emptier();
+                    queues.Remove(q);
+                    while (q.Count > 0)
+                    {
+                        int i = queues.IndexOf(Emptier());
+                        QueuedFunction item = q.Dequeue();
+                        item.Queue = i;
+                        queues[i].Enqueue(item);
+                        QueuedFunction.DBItem dbi = _context.QueuedFunctions.FirstOrDefault(_=>_.Hash == item.Hash);
+                        dbi.Queue = i;
+                        _context.Entry(dbi).State = EntityState.Modified;
+                        _context.SaveChanges();
+                    }
+                }
+            }
             if (queues.Count < n) while (queues.Count < n) queues.Add(new());
         }
 
@@ -141,13 +182,6 @@ namespace TopicosP1Backend.Scripts
             if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
             if (queued.Contains(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
             return new { Status = "Not found", Item = "Item is not queued and no result has been saved. ID may be wrong or the result may have already expired." };
-        }
-
-        private static int? GetStatusCode(ActionResult actionResult)
-        {
-            IConvertToActionResult convertToActionResult = (IConvertToActionResult)actionResult;
-            var actionResultWithStatusCode = convertToActionResult.Convert() as IStatusCodeActionResult;
-            return actionResultWithStatusCode?.StatusCode;
         }
     }
 }

@@ -35,20 +35,20 @@ namespace TopicosP1Backend.Controllers
         public object PutGroup(long id, Group.GroupPost g)
         {
             string b = JsonSerializer.Serialize(g);
-            return _queue.Request(Function.PutGroup, [$"{id}"], b, $"PutGroup {id} {b}", true);
+            return _queue.Request(Function.PutGroup, [$"{id}"], b, $"PutGroup {id} {b}");
         }
 
         [HttpPost]
         public object PostGroup(Group.GroupPost g)
         {
             string b = JsonSerializer.Serialize(g);
-            return _queue.Request(Function.PostGroup, [], b, $"PostGroup {b}", true);
+            return _queue.Request(Function.PostGroup, [], b, $"PostGroup {b}");
         }
 
         [HttpDelete("{id}")]
         public object DeleteGroup(long id)
         {
-            return _queue.Request(Function.DeleteGroup, [$"{id}"], "", $"DeleteGroup {id}", true);
+            return _queue.Request(Function.DeleteGroup, [$"{id}"], "", $"DeleteGroup {id}");
         }
 
         [HttpGet("{id}/Timeslots")]
@@ -61,20 +61,20 @@ namespace TopicosP1Backend.Controllers
         public object PostTimeSlot(long id, TimeSlot.TimeSlotPost body)
         {
             string b = JsonSerializer.Serialize(body);
-            return _queue.Request(Function.PostTimeSlot, [$"{id}"], b, $"PostTimeSlot {id} {b}", true);
+            return _queue.Request(Function.PostTimeSlot, [$"{id}"], b, $"PostTimeSlot {id} {b}");
         }
 
         [HttpPut("{id}/Timeslots/{ts}")]
         public object PutTimeSlot(long id, long ts, TimeSlot.TimeSlotPost body)
         {
             string b = JsonSerializer.Serialize(body);
-            return _queue.Request(Function.PutTimeSlot, [$"{id}", $"{ts}"], b, $"PutTimeSlot {id} {ts} {b}", true);
+            return _queue.Request(Function.PutTimeSlot, [$"{id}", $"{ts}"], b, $"PutTimeSlot {id} {ts} {b}");
         }
 
         [HttpDelete("{id}/Timeslots/{ts}")]
         public object DeleteTimeSlot(long id, long ts)
         {
-            return _queue.Request(Function.DeleteTimeSlot, [$"{id}", $"{ts}"], "", $"DeleteTimeSlot {id} {ts}", true);
+            return _queue.Request(Function.DeleteTimeSlot, [$"{id}", $"{ts}"], "", $"DeleteTimeSlot {id} {ts}");
         }
     }
 }

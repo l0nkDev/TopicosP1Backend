@@ -54,7 +54,7 @@ namespace TopicosP1Backend.Controllers
         [HttpDelete("{id}")]
         public object DeleteCareer(long id)
         {
-            return _queue.Request(Function.DeleteCareer, [$"{id}"], "", $"DeleteCareer {id}", true);
+            return _queue.Request(Function.DeleteCareer, [$"{id}"], "", $"DeleteCareer {id}");
         }
     }
 }

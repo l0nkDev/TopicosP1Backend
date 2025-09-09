@@ -53,7 +53,7 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}/Groups")]
         public object GetInsGroups(long id)
         {
-            return _queue.Request(Function.GetInsGroups, [$"{id}"], "", $"GetInsGroups {id}");
+            return _queue.Request(Function.GetInsGroups, [$"{id}"], "", $"GetInsGroups {id}", true);
         }
 
         [HttpPost("{id}/Groups")]

@@ -12,7 +12,7 @@ namespace TopicosP1Backend.Scripts
         {
             _queue = queue;
             _scopeFactory = scope;
-            _workers.Add(new(_scopeFactory, _queue));
+            //_workers.Add(new(_scopeFactory, _queue));
         }
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

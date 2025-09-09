@@ -42,20 +42,20 @@ namespace TopicosP1Backend.Controllers
         public object PutStudent(long id, Student.StudentPost student)
         {
             string b = JsonSerializer.Serialize(student);
-            return _queue.Request(Function.PutStudent, [$"{id}"], b, $"PutStudent {id} {b}", true);
+            return _queue.Request(Function.PutStudent, [$"{id}"], b, $"PutStudent {id} {b}");
         }
 
         [HttpPost]
         public object PostStudent(Student.StudentPost student)
         {
             string b = JsonSerializer.Serialize(student);
-            return _queue.Request(Function.PostStudent, [], b, $"PostStudent {b}", true);
+            return _queue.Request(Function.PostStudent, [], b, $"PostStudent {b}");
         }
 
         [HttpDelete("{id}")]
         public object DeleteStudent(long id)
         {
-            return _queue.Request(Function.DeleteStudent, [$"{id}"], "", $"DeleteStudent {id}", true);
+            return _queue.Request(Function.DeleteStudent, [$"{id}"], "", $"DeleteStudent {id}");
         }
 
         [HttpGet("{id}/history")]

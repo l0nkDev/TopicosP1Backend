@@ -40,7 +40,7 @@ namespace TopicosP1Backend.Controllers
         public object PutSubject(string id, Subject.PostSubject s)
         {
             string b = JsonSerializer.Serialize(s);
-            return _queue.Request(Function.PutSubject, [id], b, $"PutSubject {id}", true);
+            return _queue.Request(Function.PutSubject, [id], b, $"PutSubject {id}");
         }
 
         [HttpPost]
