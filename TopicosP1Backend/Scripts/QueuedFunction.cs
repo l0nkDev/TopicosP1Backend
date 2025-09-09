@@ -52,6 +52,7 @@ namespace TopicosP1Backend.Scripts
 
             public DBItem(QueuedFunction qf)
             {
+                Queue = qf.Queue;
                 Hash = qf.Hash;
                 Function = (int)qf.Function;
                 ItemIds = JsonSerializer.Serialize(qf.ItemIds);

@@ -17,7 +17,6 @@ namespace TopicosP1Backend.Scripts
         {
             _queue = queue;
             _scopeFactory = scope;
-            _workers.Add(new(_scopeFactory, _queue));
             CacheContext c = scope.CreateScope().ServiceProvider.GetService<CacheContext>();
             wcount wc = c.wcounts.FirstOrDefault();
             if (wc == null) { wc = new() { Count = 1 }; c.wcounts.Add(wc); c.SaveChanges(); }
