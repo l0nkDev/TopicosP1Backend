@@ -43,15 +43,15 @@ namespace TopicosP1Backend.Scripts
             }
         }
         public void AddResponse(string id, object obj) 
-        { 
-            responses.Add(id, obj); 
+        { try { responses.Add(id, obj); } catch { }
             queued.Remove(id); 
         }
 
         public object Get(string id, bool delete) 
         { 
             object obj = responses[id]; 
-            if (delete) responses.Remove(id); 
+            if (delete) responses.Remove(id);
+            if (responses.Count <= 0) responses = new(); 
             return obj; 
         }
 
@@ -106,7 +106,7 @@ namespace TopicosP1Backend.Scripts
         {
             string tranid = Util.Hash(hashtarget);
             if (IsQueued(tranid) != null) return tranid;
-            try { return Get(tranid, delete); } catch { Console.WriteLine("Failed!"); }
+            try { return Get(tranid, delete); } catch { }
             if (queues.Count == 0) return "No queues available.";
             Add(new QueuedFunction()
             { Queue = queues.IndexOf(Emptier()) ,Function = function, ItemIds = itemIds, Hash = tranid, Body = body });

@@ -13,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Context>(opt =>
 //    opt.UseNpgsql("Username=postgres; Password=\\^MGbat%=5deeuN; Host=34.55.58.2; Database=topicos;"));
+//    opt.UseNpgsql("Username=postgres; Password=postgres; Host=localhost; Database=topicos;"));
 //    opt.UseInMemoryDatabase("main"));
     opt.UseSqlite("Data Source=main.db"));
 builder.Services.AddDbContext<CacheContext>(opt =>
@@ -31,7 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
