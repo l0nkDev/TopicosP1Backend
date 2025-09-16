@@ -630,7 +630,9 @@ namespace TopicosP1Backend.Scripts
             {
                 new() { FirstName = "Raul", LastName = "Farell Vaca"},
                 new() { FirstName = "Santiago", LastName = "Contreras Fuentes" },
-                new() { FirstName = "Joaquin", LastName = "Chumacero Coca" },
+                new() { FirstName = "Joaquin", LastName = "Chumacero" },
+                new() { FirstName = "Saturnino", LastName = "Mamani" },
+                new() { FirstName = "Carlos", LastName = "Coca" },
             };
             context.Students.AddRange(students);
 

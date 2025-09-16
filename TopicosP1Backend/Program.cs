@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using TopicosP1Backend.Scripts;
 using TopicosP1Backend.Cache;
 
@@ -21,7 +20,6 @@ builder.Services.AddDbContext<CacheContext>(opt =>
 builder.Services.AddSingleton<APIQueue>();
 builder.Services.AddSingleton<WorkerManager>();
 builder.Services.AddHostedService(_ => _.GetRequiredService<WorkerManager>());
-
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

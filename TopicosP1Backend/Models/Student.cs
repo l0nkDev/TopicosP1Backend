@@ -75,7 +75,7 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<List<StudentGroups.HistoryEntry>>> History(Context context, long id)
         {
-            var student = await context.Students.IgnoreAutoIncludes()
+            var student = await context.Students.IgnoreAutoIncludes().AsSplitQuery()
                 .Include(_ => _.StudentGroups).ThenInclude(_ => _.Group).ThenInclude(_ => _.Subject)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Prerequisites)
                 .FirstOrDefaultAsync(_ => _.Id == id);
@@ -87,7 +87,7 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<List<Subject.SubjectWithGroups>>> Available(Context context, long id)
         {
-            var student = await context.Students.IgnoreAutoIncludes()
+            var student = await context.Students.IgnoreAutoIncludes().AsSplitQuery()
                 .Include(_ => _.StudentGroups).ThenInclude(_ => _.Group).ThenInclude(_ => _.Subject)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Prerequisites)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)

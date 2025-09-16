@@ -23,13 +23,13 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetStudyPlans()
         {
-            return _queue.Request(Function.GetStudyPlans, [], "", "GetStudyPlans", true);
+            return _queue.Request(Function.GetStudyPlans, [], "", "GetStudyPlans");
         }
 
         [HttpGet("{id}")]
         public object GetStudyPlan(string id)
         {
-            return _queue.Request(Function.GetStudyPlan, [id], "", $"GetStudyPlan {id}", true);
+            return _queue.Request(Function.GetStudyPlan, [id], "", $"GetStudyPlan {id}");
         }
 
         [HttpPut("{id}")]
@@ -55,7 +55,7 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}/Subjects")]
         public object GetSpSubjects(string id)
         {
-            return _queue.Request(Function.GetSpSubjects, [id], "", $"GetSpSubjects {id}", true);
+            return _queue.Request(Function.GetSpSubjects, [id], "", $"GetSpSubjects {id}");
         }
 
         [HttpPost("{id}/Subjects")]

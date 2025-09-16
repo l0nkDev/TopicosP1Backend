@@ -44,13 +44,13 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<IEnumerable<GroupDTO>>> GetGroups(Context _context)
         {
-            List<Group> l = await _context.Groups.ToListAsync();
+            List<Group> l = await _context.Groups.AsSplitQuery().ToListAsync();
             return (from i in l select i.Simple()).ToList();
         }
 
         public static async Task<ActionResult<GroupDTO>> GetGroup(Context _context, long id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var @group = await _context.Groups.AsSplitQuery().FirstOrDefaultAsync(_=>_.Id == id);
 
             if (@group == null)
             {
@@ -100,7 +100,7 @@ namespace CareerApi.Models
 
         public static async Task<IActionResult> DeleteGroup(Context _context, long id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var @group = await _context.Groups.AsSplitQuery().FirstOrDefaultAsync(_=>_.Id == id);
             if (@group == null)
             {
                 return new NotFoundResult();
@@ -114,7 +114,7 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<List<TimeSlot.TimeSlotDTO>>> GetTimeSlots(Context _context, long id)
         {
-            Group g = await _context.Groups.Include(_=>_.TimeSlots).ThenInclude(_ => _.Room).ThenInclude(_ => _.Module).FirstOrDefaultAsync(_=>_.Id == id);
+            Group g = await _context.Groups.AsSplitQuery().Include(_=>_.TimeSlots).ThenInclude(_ => _.Room).ThenInclude(_ => _.Module).FirstOrDefaultAsync(_=>_.Id == id);
             return (from i in g.TimeSlots select i.Simple()).ToList();
         }
 

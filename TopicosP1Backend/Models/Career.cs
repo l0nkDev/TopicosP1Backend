@@ -26,13 +26,13 @@ namespace CareerApi.Models
         }
         public static async Task<IEnumerable<CareerDTO>> GetCareers(Context _context)
         {
-            var careers = await _context.Careers.ToListAsync();
+            var careers = await _context.Careers.AsSplitQuery().ToListAsync();
             return from a in careers select a.SimpleList();
         }
 
         public static async Task<ActionResult<CareerDTO>> GetCareer(Context _context, long id)
         {
-            var career = await _context.Careers.FindAsync(id);
+            var career = await _context.Careers.AsSplitQuery().FirstOrDefaultAsync(_=>_.Id == id);
             if (career == null) return new NotFoundResult();
             return career.SimpleList();
         }

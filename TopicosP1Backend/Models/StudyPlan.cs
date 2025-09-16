@@ -45,14 +45,14 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<StudyPlanDTO>> GetStudyPlan(Context context, string id)
         {
-            var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
+            var studyPlan = await context.StudyPlans.AsSplitQuery().FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             StudyPlanDTO res = new(studyPlan);
             return res;
         }
         public static async Task<IEnumerable<StudyPlanDTO>> GetStudyPlans(Context context)
         {
-            var db = await context.StudyPlans.ToListAsync();
+            var db = await context.StudyPlans.AsSplitQuery().ToListAsync();
             var studyplans = from sp in db select new StudyPlanDTO(sp);
             return studyplans;
         }
@@ -77,6 +77,7 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<StudyPlanDTO>> PostStudyPlan(Context _context, StudyPlanPost c)
         {
+            if (await _context.StudyPlans.FindAsync(c.Code) != null) return new BadRequestResult();
             Career? carr = await _context.Careers.FindAsync(c.Career);
             if (carr == null) return new NotFoundResult();
             StudyPlan sp = new StudyPlan { Code = c.Code, Career = carr};
@@ -87,7 +88,7 @@ namespace CareerApi.Models
 
         public static async Task<IActionResult> DeleteStudyPlan(Context _context, string id)
         {
-            var sp = await _context.StudyPlans.FindAsync(id);
+            var sp = await _context.StudyPlans.IgnoreAutoIncludes().FirstOrDefaultAsync(_=>_.Code == id);
             if (sp == null) return new NotFoundResult();
             _context.StudyPlans.Remove(sp);
             await _context.SaveChangesAsync();
@@ -95,15 +96,15 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<List<SpSubject.SpSubjectDTO>>> GetSpSubject(Context context, string id)
         {
-            var studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
+            var studyPlan = await context.StudyPlans.AsSplitQuery().FirstOrDefaultAsync(i => i.Code == id);
             if (studyPlan == null) return new NotFoundResult();
             var subs = studyPlan.SpSubjects;
             return (from i in subs select i.SimpleList()).ToList();
         }
         public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PostSpSubject(Context context, string id, StudyPlanSubjectPost spsub)
         {
-            StudyPlan studyPlan = await context.StudyPlans.FirstOrDefaultAsync(i => i.Code == id);
-            Subject subject = await context.Subjects.FindAsync(spsub.Subject);
+            StudyPlan studyPlan = await context.StudyPlans.AsSplitQuery().FirstOrDefaultAsync(i => i.Code == id);
+            Subject subject = await context.Subjects.AsSplitQuery().FirstOrDefaultAsync(_=>_.Code == spsub.Subject);
             if (studyPlan == null || subject == null) return new NotFoundResult();
             var n = new SpSubject() { Credits = spsub.Credits, Level = spsub.Level, Type = spsub.Type, StudyPlan = studyPlan, Subject = subject };
             context.SpSubjects.Add(n);
@@ -112,7 +113,7 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<SpSubject.SpSubjectDTO>> PutSpSubject(Context context, string id, string sub, StudyPlanSubjectPost spsub)
         {
-            var sps = await context.SpSubjects.IgnoreAutoIncludes().Include(_=>_.Subject).FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
+            var sps = await context.SpSubjects.AsSplitQuery().IgnoreAutoIncludes().Include(_=>_.Subject).FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
             sps.Level = spsub.Level; sps.Credits = spsub.Credits; sps.Type = spsub.Type;
             context.Entry(sps).State = EntityState.Modified;
@@ -129,7 +130,7 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<List<Subject.SubjectSimple>>> GetSpSubDependencies(Context context, string id, string sub)
         {
-            var sps = await context.SpSubjects.FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
+            var sps = await context.SpSubjects.AsSplitQuery().FirstOrDefaultAsync(i => i.StudyPlan.Code == id && i.Subject.Code == sub);
             if (sps == null) return new NotFoundResult();
             var lis = context.SubjectDependencies.Where(_ => _.StudyPlan.Code == id && _.Postrequisite.Code == sub);
             return (from i in lis select i.Prerequisite.Simple()).ToList();

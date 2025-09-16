@@ -39,6 +39,7 @@ namespace CareerApi.Models
 
         public static async Task<ActionResult<ModuleDTO>> PostModule(Context _context, ModulePost m)
         {
+            if (await _context.Modules.FindAsync(m.Number) != null) return new BadRequestResult();
             Module @module = new() { Number = m.Number };
             _context.Modules.Add(@module);
             await _context.SaveChangesAsync();

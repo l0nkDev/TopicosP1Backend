@@ -38,6 +38,7 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<Gestion>> PostGestion(Context _context, Gestion gestion)
         {
+            if (await _context.Gestions.FindAsync(gestion.Year) != null) return new BadRequestResult();
             _context.Gestions.Add(gestion);
             await _context.SaveChangesAsync();
             return gestion;

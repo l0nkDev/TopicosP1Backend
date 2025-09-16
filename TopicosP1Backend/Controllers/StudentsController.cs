@@ -61,13 +61,13 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}/history")]
         public object GetStudentHistory(long id)
         {
-            return _queue.Request(Function.GetStudentHistory, [id.ToString()], "", $"GetStudentHistory {id}", true);
+            return _queue.Request(Function.GetStudentHistory, [id.ToString()], "", $"GetStudentHistory {id}");
         }
 
         [HttpGet("{id}/available")]
         public object GetStudentAvailable(long id)
         {
-            return _queue.Request(Function.GetStudentAvaliables, [id.ToString()], "", $"GetStudentAvailables {id}", true);
+            return _queue.Request(Function.GetStudentAvaliables, [id.ToString()], "", $"GetStudentAvailables {id}");
         }
     }
 }

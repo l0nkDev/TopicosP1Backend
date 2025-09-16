@@ -54,7 +54,7 @@ namespace CareerApi.Models
         }
         public static async Task<ActionResult<IEnumerable<SubjectSimple>>> GetAll(Context _context)
         {
-            var l = await _context.Subjects.ToListAsync();
+            var l = await _context.Subjects.AsSplitQuery().ToListAsync();
             return (from a in l select a.Simple()).ToList();
         }
 
@@ -62,13 +62,14 @@ namespace CareerApi.Models
         [HttpGet("{id}")]
         public static async Task<ActionResult<SubjectSimple>> Get(Context _context, string id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
+            var subject = await _context.Subjects.AsSplitQuery().FirstOrDefaultAsync(_=>_.Code == id);
             if (subject == null) return new NotFoundResult();
             return subject.Simple();
         }
 
         public static async Task<ActionResult<Subject>> Post(Context _context, PostSubject s)
         {
+            if (await _context.Subjects.FindAsync(s.Code) != null) return new BadRequestResult();
             Subject subject = new Subject() { Code = s.Code, Title = s.Title };
             _context.Subjects.Add(subject);
             try { await _context.SaveChangesAsync(); }

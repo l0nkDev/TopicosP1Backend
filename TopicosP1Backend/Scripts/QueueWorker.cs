@@ -33,7 +33,7 @@ namespace TopicosP1Backend.Scripts
                 {
                     if (_queue.Count() != 0 && (a = _queue.Dequeue()) != null)
                     {
-                        Console.WriteLine($"Running Worker {this.GetHashCode()}");
+                        Console.WriteLine($"Worker {this.GetHashCode()}: Running {a.Function.GetDisplayName()}; {string.Join(", ", a.ItemIds)}; {a.Body}");
                         Status = "Running";
                         if (scope == null)
                         {
