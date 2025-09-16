@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
@@ -21,6 +22,7 @@ namespace TopicosP1Backend.Scripts
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            bool usecache = _queue.isasync;
             await Task.Run(async () =>
             {
                 IServiceScope? scope = null;
@@ -37,13 +39,17 @@ namespace TopicosP1Backend.Scripts
                         {
                             scope = scopeFactory.CreateScope();
                             context = scope.ServiceProvider.GetService<Context>();
-                            cache = scope.ServiceProvider.GetService<CacheContext>();
+                            if (usecache) cache = scope.ServiceProvider.GetService<CacheContext>();
                         }
-                        var exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_=>_.Hash == a.Hash);
+                        QueuedFunction.DBItem? exiting = null;
+                        if (usecache) exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_=>_.Hash == a.Hash);
                         object res = await a.Execute(context);
                         if (exiting != null) cache.QueuedFunctions.Remove(exiting);
-                        cache.SaveChanges();
+                        if (usecache) cache.SaveChanges();
                         _queue.AddResponse(a.Hash, res);
+                        string dn = a.Function.GetDisplayName();
+                        _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+                        await Task.Yield();
                     }
                     else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Delay(1000, stoppingToken); }
                 }

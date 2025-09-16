@@ -59,8 +59,11 @@ namespace CareerApi.Models
         public static async Task<IActionResult> PutStudyPlan(Context _context, string id, StudyPlanPost sp)
         {
             if (id != sp.Code) return new BadRequestResult();
-            StudyPlan studyplan = await _context.StudyPlans.FindAsync(id);
-            studyplan.Career = await _context.Careers.FindAsync(sp.Career);
+            StudyPlan stp = await _context.StudyPlans.FindAsync(id);
+            Career car = await _context.Careers.FindAsync(sp.Career);
+            StudyPlan studyplan = stp;
+            if (stp == null || car == null) return new NotFoundResult();
+            studyplan.Career = car;
             _context.Entry(studyplan).State = EntityState.Modified;
 
             try { await _context.SaveChangesAsync(); }

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using TopicosP1Backend.Cache;
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace TopicosP1Backend.Scripts
 {
@@ -14,12 +17,17 @@ namespace TopicosP1Backend.Scripts
     public class APIQueue
     {
         private readonly IServiceScopeFactory scopeFactory;
-        private List<Queue<QueuedFunction>> queues = [new()];
-        private HashSet<string> queued = new HashSet<string>();
-        private Dictionary<string, object> responses = [];
+        private List<ConcurrentQueue<QueuedFunction>> queues = [new()];
+        private ConcurrentDictionary<string, byte> queued = [];
+        private ConcurrentDictionary<string, object> responses = [];
+        public ConcurrentDictionary<string, int> thingsdone = [];
+        public ConcurrentDictionary<string, int> thingsreceived = [];
+        public bool isasync = true;
 
         public APIQueue(IServiceScopeFactory scopeFactory)
         {
+            thingsdone.TryAdd("Total", 0);
+            thingsreceived.TryAdd("Total", 0);
             this.scopeFactory = scopeFactory;
             IServiceScope? scope = scopeFactory.CreateScope();
             CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
@@ -33,29 +41,30 @@ namespace TopicosP1Backend.Scripts
 
         public void Add(QueuedFunction action)
         {
-            using (IServiceScope scope = scopeFactory.CreateScope())
-            {
-                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
-                _context.QueuedFunctions.Add(action.ToDBItem());
-                _context.SaveChanges();
-                queued.Add(action.Hash);
-                Emptier().Enqueue(action);  
-            }
+                using (IServiceScope scope = scopeFactory.CreateScope())
+                {
+                    CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                    _context.QueuedFunctions.Add(action.ToDBItem());
+                    _context.SaveChanges();
+                    queued.TryAdd(action.Hash, 0);
+                    Emptier().Enqueue(action);
+                }
         }
         public void AddResponse(string id, object obj) 
-        { try { responses.Add(id, obj); } catch { }
-            queued.Remove(id); 
+        { 
+            responses.TryAdd(id, obj);
+            queued.Remove(id, out _);
         }
 
         public object Get(string id, bool delete) 
         { 
             object obj = responses[id]; 
-            if (delete) responses.Remove(id);
+            if (delete) responses.Remove(id, out _);
             if (responses.Count <= 0) responses = new(); 
             return obj; 
         }
 
-        public string? IsQueued(string id) => queued.Contains(id) ? id : null;
+        public string? IsQueued(string id) => queued.ContainsKey(id) ? id : null;
 
         public int Count() 
         { 
@@ -65,21 +74,15 @@ namespace TopicosP1Backend.Scripts
         }
 
         public QueuedFunction? Dequeue() 
-        { 
-            try 
-            { 
-                return Fuller().Dequeue(); 
-            } 
-            catch 
-            { 
-                return null; 
-            }
+        {
+            if (Fuller().TryDequeue(out QueuedFunction deqr)) return deqr;
+            else return null;
         }
 
-        public Queue<QueuedFunction>? Emptier()
+        public ConcurrentQueue<QueuedFunction>? Emptier()
         {
             if (queues.Count == 0) return null;
-            Queue<QueuedFunction> res = queues[0];
+            ConcurrentQueue<QueuedFunction> res = queues[0];
             int c = queues[0].Count;
             foreach (var q in queues) if (q.Count < c)
                 {
@@ -89,10 +92,10 @@ namespace TopicosP1Backend.Scripts
             return res;
         }
 
-        public Queue<QueuedFunction>? Fuller()
+        public ConcurrentQueue<QueuedFunction>? Fuller()
         {
             if (queues.Count == 0) return null;
-            Queue<QueuedFunction> res = queues[0];
+            ConcurrentQueue<QueuedFunction> res = queues[0];
             int c = queues[0].Count;
             foreach (var q in queues) if (q.Count > c)
                 {
@@ -105,16 +108,26 @@ namespace TopicosP1Backend.Scripts
         public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false)
         {
             string tranid = Util.Hash(hashtarget);
+            QueuedFunction qf = new QueuedFunction()
+            { Queue = queues.IndexOf(Emptier()), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
+            string dn = function.GetDisplayName();
+            thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+
+
+            if (!isasync)
+                using (IServiceScope scope = scopeFactory.CreateScope())
+                    return qf.Execute(scope.ServiceProvider.GetService<Context>());
+
+
             if (IsQueued(tranid) != null) return tranid;
             try { return Get(tranid, delete); } catch { }
             if (queues.Count == 0) return "No queues available.";
-            Add(new QueuedFunction()
-            { Queue = queues.IndexOf(Emptier()) ,Function = function, ItemIds = itemIds, Hash = tranid, Body = body });
+            Add(qf);
             return tranid;
         }
 
-        public List<Queue<QueuedFunction>> GetQueues() => queues;
-        public Queue<QueuedFunction> GetQueue(int id) => queues[id];
+        public List<ConcurrentQueue<QueuedFunction>> GetQueues() => queues;
+        public ConcurrentQueue<QueuedFunction> GetQueue(int id) => queues[id];
         public void SetQueuesCount(int n)
         {
             if (queues.Count == n) return;
@@ -128,18 +141,18 @@ namespace TopicosP1Backend.Scripts
                 if (queues.Count > n)
                 if (n == 0)
                 {
-                    queues = new List<Queue<QueuedFunction>>();
+                    queues = new List<ConcurrentQueue<QueuedFunction>>();
                     _context.QueuedFunctions.ExecuteDelete();
-                    queued = new HashSet<string>();
+                    queued = new ConcurrentDictionary<string, byte>();
                 }
                 while (queues.Count > n)
                 {
-                    Queue<QueuedFunction> q = Emptier();
+                    ConcurrentQueue<QueuedFunction> q = Emptier();
                     queues.Remove(q);
                     while (q.Count > 0)
                     {
                         int i = queues.IndexOf(Emptier());
-                        QueuedFunction item = q.Dequeue();
+                        q.TryDequeue(out QueuedFunction item);
                         item.Queue = i;
                         queues[i].Enqueue(item);
                         QueuedFunction.DBItem dbi = _context.QueuedFunctions.FirstOrDefault(_=>_.Hash == item.Hash);
@@ -180,7 +193,7 @@ namespace TopicosP1Backend.Scripts
                 }
             }
             if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
-            if (queued.Contains(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
+            if (queued.ContainsKey(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
             return new { Status = "Not found", Item = "Item is not queued and no result has been saved. ID may be wrong or the result may have already expired." };
         }
     }

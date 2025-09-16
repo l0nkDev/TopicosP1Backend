@@ -87,6 +87,7 @@ namespace CareerApi.Models
         {
             if (id != s.Code) return new BadRequestResult();
             Subject subject = await _context.Subjects.FindAsync(id);
+            if (subject == null) return new NotFoundResult();
             subject.Title = s.Title;
             _context.Entry(subject).State = EntityState.Modified;
 

@@ -63,12 +63,16 @@ namespace CareerApi.Models
         public static async Task<ActionResult<GroupDTO>> PutGroup(Context _context, long id, GroupPost g)
         {
             Group group = await _context.Groups.FindAsync(id);
+            Period period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == g.Period && _.Gestion.Year == g.Gestion);
+            Teacher teacher = await _context.Teachers.FindAsync(g.Teacher);
+            Subject subject = await _context.Subjects.FindAsync(g.Subject);
             if (id != g.Id) return new BadRequestResult();
-            group.Period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == g.Period && _.Gestion.Year == g.Gestion);
+            if (group == null || period == null || teacher == null || subject == null) return new NotFoundResult();
+            group.Period = period;
             group.Code = g.Code;
             group.Mode = g.Mode;
-            group.Subject = await _context.Subjects.FindAsync(g.Subject);
-            group.Teacher = await _context.Teachers.FindAsync(g.Teacher);
+            group.Subject = subject;
+            group.Teacher = teacher;
             group.Quota = g.Quota;
             _context.Entry(group).State = EntityState.Modified;
             try { await _context.SaveChangesAsync(); }

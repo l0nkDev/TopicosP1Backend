@@ -527,6 +527,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Year = 2023},
                 new() { Year = 2024},
                 new() { Year = 2025},
+                new() { Year = 2077},
             };
             context.Gestions.AddRange(gestions);
 
@@ -586,6 +587,7 @@ namespace TopicosP1Backend.Scripts
             var modules = new List<Module>()
             {
                 new() { Number = 236},
+                new() { Number = 100},
             };
             context.Modules.AddRange(modules);
 
@@ -620,6 +622,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Module = modules[0], Number = 44},//26
                 new() { Module = modules[0], Number = 45},//27
                 new() { Module = modules[0], Number = 46},//28
+                new() { Module = modules[0], Number = 51},//28
             };
             context.Rooms.AddRange(rooms);
 

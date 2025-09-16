@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 using TopicosP1Backend.Scripts;
 
 namespace TopicosP1Backend.Controllers
@@ -11,13 +12,13 @@ namespace TopicosP1Backend.Controllers
         private readonly WorkerManager _manager = manager;
 
         [HttpGet("Queues")]
-        public async Task<ActionResult<List<Queue<QueuedFunction>>>> GetQueues()
+        public async Task<ActionResult<List<ConcurrentQueue<QueuedFunction>>>> GetQueues()
         {
             return _queue.GetQueues();
         }
 
         [HttpGet("Queues/{id}")]
-        public async Task<ActionResult<Queue<QueuedFunction>>> GetQueue(int id)
+        public async Task<ActionResult<ConcurrentQueue<QueuedFunction>>> GetQueue(int id)
         {
             return _queue.GetQueue(id);
         }
@@ -64,6 +65,34 @@ namespace TopicosP1Backend.Controllers
         public async Task<ActionResult<object>> GetTransaction(string id)
         {
             return _queue.getTranStatus(id);
+        }
+
+        [HttpGet("MakeAsync")]
+        public async Task<ActionResult<object>> MakeAsync()
+        {
+            return _queue.isasync = true;
+        }
+
+        [HttpGet("MakeSync")]
+        public async Task<ActionResult<object>> MakeSync()
+        {
+            return _queue.isasync = false;
+        }
+
+        [HttpGet("ThingsReceived")]
+        public async Task<ActionResult<object>> GetThingsReceived()
+        {
+            int total = _queue.thingsreceived["Total"];
+            _queue.thingsreceived["Total"] = _queue.thingsreceived.Values.Sum() - total;
+            return _queue.thingsreceived;
+        }
+
+        [HttpGet("ThingsDone")]
+        public async Task<ActionResult<object>> GetThingsDone()
+        {
+            int total = _queue.thingsdone["Total"];
+            _queue.thingsdone["Total"] = _queue.thingsdone.Values.Sum() - total;
+            return _queue.thingsdone;
         }
     }
 }
