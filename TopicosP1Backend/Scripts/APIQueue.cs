@@ -9,17 +9,17 @@ namespace TopicosP1Backend.Scripts
     {
         public long Id { get; set; }
 
-        public List<int> Endpoints { get; set; } = [99];
+        public List<int> Endpoints { get; set; } = [-1];
     }
 
     public class CustomQueue: ConcurrentQueue<QueuedFunction>
     {
-        public HashSet<int> Endpoints { get; set; } = [-1];
+        public List<int> Endpoints { get; set; } = [-1];
     }
     public class APIQueue
     {
         private readonly IServiceScopeFactory scopeFactory;
-        private List<CustomQueue> queues = [new()];
+        private List<CustomQueue> queues = [];
         private ConcurrentDictionary<string, byte> queued = [];
         private ConcurrentDictionary<string, object> responses = [];
         public ConcurrentDictionary<string, int> thingsdone = [];
@@ -34,13 +34,13 @@ namespace TopicosP1Backend.Scripts
             IServiceScope? scope = scopeFactory.CreateScope();
             CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
             List<Qcount> qcs = cache.qcounts.ToList();
-            foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints.ToHashSet() });
+            foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints });
             List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;
         }
 
-        public bool Add(QueuedFunction action)
+        public void Add(QueuedFunction action)
         {
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
@@ -48,9 +48,21 @@ namespace TopicosP1Backend.Scripts
                 _context.QueuedFunctions.Add(action.ToDBItem());
                 _context.SaveChanges();
                 queued.TryAdd(action.Hash, 0);
-                Emptier(((int)action.Function)).Enqueue(action);
+                CustomQueue emptier = queues[action.Queue];
+                emptier.Enqueue(action);
             }
-            return false;
+        }
+
+        public void AddQueue(List<int> Endpoints)
+        {
+            if (Endpoints == null) Endpoints = [-1];
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                _context.qcounts.Add(new() { Endpoints = Endpoints});
+                _context.SaveChanges();
+                queues.Add(new() { Endpoints = Endpoints });
+            }
         }
         public void AddResponse(string id, object obj) 
         { 
@@ -96,13 +108,15 @@ namespace TopicosP1Backend.Scripts
         public CustomQueue? Emptier(int function = -1)
         {
             if (queues.Count == 0) return null;
-            CustomQueue res = queues[0];
-            int c = queues[0].Count;
-            foreach (var q in queues) if (q.Count < c)
-                {
-                    res = q;
-                    c = q.Count;
-                }
+            CustomQueue? res = null;
+            int? c = null;
+            foreach (var q in queues)
+                if (c == null || q.Count < c)
+                    if (function == -1 || q.Endpoints.Contains(function))
+                    {
+                        res = q;
+                        c = q.Count;
+                    }
             return res;
         }
 
@@ -124,6 +138,7 @@ namespace TopicosP1Backend.Scripts
             string tranid = Util.Hash(hashtarget);
             QueuedFunction qf = new QueuedFunction()
             { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
+            if (qf.Queue == -1) return "No queue available for this function.";
             string dn = function.GetDisplayName();
             thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
 

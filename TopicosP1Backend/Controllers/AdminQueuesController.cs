@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using TopicosP1Backend.Scripts;
@@ -23,6 +24,7 @@ namespace TopicosP1Backend.Controllers
                 Dictionary<string, object> tmp = [];
                 tmp.Add("Id", i+1);
                 tmp.Add("Count", queues[i].Count);
+                tmp.Add("Endpoints", from q in queues[i].Endpoints select ((Function)q).GetDisplayName());
                 tmp.Add("Items", queues[i]);
                 res.Add(tmp);
                 i++;
@@ -33,12 +35,21 @@ namespace TopicosP1Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Dictionary<string, object>>> GetQueue(int id)
         {
-            ConcurrentQueue<QueuedFunction> queue = _queue.GetQueue(id);
+            CustomQueue queue = _queue.GetQueue(id);
             Dictionary<string, object> tmp = [];
             tmp.Add("Id", id);
             tmp.Add("Count", queue.Count);
+            tmp.Add("Endpoints", from q in queue.Endpoints select ((Function)q).GetDisplayName());
             tmp.Add("Items", queue);
             return tmp;
+
+        }
+
+        [HttpPost("")]
+        public async Task<ActionResult<Dictionary<string, object>>> AddQueue(List<int> Endpoints = null)
+        {
+            _queue.AddQueue(Endpoints);
+            return new OkResult();
 
         }
 
