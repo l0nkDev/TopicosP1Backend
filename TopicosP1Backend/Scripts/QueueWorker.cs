@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
+using System.Collections.Concurrent;
 using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
@@ -11,6 +10,9 @@ namespace TopicosP1Backend.Scripts
     {
         private readonly IServiceScopeFactory scopeFactory;
         private readonly APIQueue _queue;
+        public int assignedqueue = 0;
+        public int take = 10;
+        public ConcurrentQueue<QueuedFunction> taken = [];
         public string Status = "";
         private CancellationTokenSource cts = new();
 
@@ -28,28 +30,30 @@ namespace TopicosP1Backend.Scripts
                 IServiceScope? scope = null;
                 Context? context = null;
                 CacheContext? cache = null;
-                QueuedFunction? a = null;
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    if (_queue.Count() != 0 && (a = _queue.Dequeue()) != null)
+                    if (_queue.Count() != 0 && (taken = _queue.Dequeue(take, assignedqueue)).Count > 0)
                     {
-                        Console.WriteLine($"Worker {this.GetHashCode()}: Running {a.Function.GetDisplayName()}; {string.Join(", ", a.ItemIds)}; {a.Body}");
-                        Status = "Running";
-                        if (scope == null)
+                        while (taken.Count > 0 && taken.TryDequeue(out QueuedFunction a))
                         {
-                            scope = scopeFactory.CreateScope();
-                            context = scope.ServiceProvider.GetService<Context>();
-                            if (usecache) cache = scope.ServiceProvider.GetService<CacheContext>();
+                            Console.WriteLine($"Worker {this.GetHashCode()}: Running {a.Function.GetDisplayName()}; {string.Join(", ", a.ItemIds)}; {a.Body}");
+                            Status = "Running";
+                            if (scope == null)
+                            {
+                                scope = scopeFactory.CreateScope();
+                                context = scope.ServiceProvider.GetService<Context>();
+                                if (usecache) cache = scope.ServiceProvider.GetService<CacheContext>();
+                            }
+                            QueuedFunction.DBItem? exiting = null;
+                            if (usecache) exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_ => _.Hash == a.Hash);
+                            object res = await a.Execute(context);
+                            if (exiting != null) cache.QueuedFunctions.Remove(exiting);
+                            if (usecache) cache.SaveChanges();
+                            _queue.AddResponse(a.Hash, res);
+                            string dn = a.Function.GetDisplayName();
+                            _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+                            await Task.Yield();
                         }
-                        QueuedFunction.DBItem? exiting = null;
-                        if (usecache) exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_=>_.Hash == a.Hash);
-                        object res = await a.Execute(context);
-                        if (exiting != null) cache.QueuedFunctions.Remove(exiting);
-                        if (usecache) cache.SaveChanges();
-                        _queue.AddResponse(a.Hash, res);
-                        string dn = a.Function.GetDisplayName();
-                        _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
-                        await Task.Yield();
                     }
                     else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Delay(1000, stoppingToken); }
                 }

@@ -1,23 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using TopicosP1Backend.Cache;
-using System;
-using Microsoft.EntityFrameworkCore;
+﻿using TopicosP1Backend.Cache;
 using Microsoft.OpenApi.Extensions;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace TopicosP1Backend.Scripts
 {
-    public class qcount
+
+    public class Qcount
     {
         public long Id { get; set; }
-        required public int Count { get; set; }
+
+        public List<int> Endpoints { get; set; } = [99];
+    }
+
+    public class CustomQueue: ConcurrentQueue<QueuedFunction>
+    {
+        public HashSet<int> Endpoints { get; set; } = [-1];
     }
     public class APIQueue
     {
         private readonly IServiceScopeFactory scopeFactory;
-        private List<ConcurrentQueue<QueuedFunction>> queues = [new()];
+        private List<CustomQueue> queues = [new()];
         private ConcurrentDictionary<string, byte> queued = [];
         private ConcurrentDictionary<string, object> responses = [];
         public ConcurrentDictionary<string, int> thingsdone = [];
@@ -31,24 +33,24 @@ namespace TopicosP1Backend.Scripts
             this.scopeFactory = scopeFactory;
             IServiceScope? scope = scopeFactory.CreateScope();
             CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
-            qcount qc = cache.qcounts.FirstOrDefault();
-            if (qc == null) { qc = new() { Count = 1 }; cache.qcounts.Add(qc); cache.SaveChanges(); }
-            SetQueuesCount(qc.Count);
+            List<Qcount> qcs = cache.qcounts.ToList();
+            foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints.ToHashSet() });
             List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;
         }
 
-        public void Add(QueuedFunction action)
+        public bool Add(QueuedFunction action)
         {
-                using (IServiceScope scope = scopeFactory.CreateScope())
-                {
-                    CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
-                    _context.QueuedFunctions.Add(action.ToDBItem());
-                    _context.SaveChanges();
-                    queued.TryAdd(action.Hash, 0);
-                    Emptier().Enqueue(action);
-                }
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                _context.QueuedFunctions.Add(action.ToDBItem());
+                _context.SaveChanges();
+                queued.TryAdd(action.Hash, 0);
+                Emptier(((int)action.Function)).Enqueue(action);
+            }
+            return false;
         }
         public void AddResponse(string id, object obj) 
         { 
@@ -70,19 +72,31 @@ namespace TopicosP1Backend.Scripts
         { 
             int c = 0; 
             foreach (var q in queues) c += q.Count; 
-            return c; 
+            return c;
         }
 
-        public QueuedFunction? Dequeue() 
+        public CustomQueue Dequeue(int take, int q)
         {
-            if (Fuller().TryDequeue(out QueuedFunction deqr)) return deqr;
-            else return null;
+            CustomQueue deq = [];
+            while (take > 0)
+            {
+                QueuedFunction deqr;
+                bool taken;
+                if (q == 0)
+                    taken = Emptier().TryDequeue(out deqr);
+                else
+                    taken = queues[q - 1].TryDequeue(out deqr);
+                if (taken) deq.Enqueue(deqr);
+                else break;
+                take--;
+            }
+            return deq;
         }
 
-        public ConcurrentQueue<QueuedFunction>? Emptier()
+        public CustomQueue? Emptier(int function = -1)
         {
             if (queues.Count == 0) return null;
-            ConcurrentQueue<QueuedFunction> res = queues[0];
+            CustomQueue res = queues[0];
             int c = queues[0].Count;
             foreach (var q in queues) if (q.Count < c)
                 {
@@ -109,7 +123,7 @@ namespace TopicosP1Backend.Scripts
         {
             string tranid = Util.Hash(hashtarget);
             QueuedFunction qf = new QueuedFunction()
-            { Queue = queues.IndexOf(Emptier()), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
+            { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
             string dn = function.GetDisplayName();
             thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
 
@@ -126,45 +140,8 @@ namespace TopicosP1Backend.Scripts
             return tranid;
         }
 
-        public List<ConcurrentQueue<QueuedFunction>> GetQueues() => queues;
-        public ConcurrentQueue<QueuedFunction> GetQueue(int id) => queues[id];
-        public void SetQueuesCount(int n)
-        {
-            if (queues.Count == n) return;
-            using (IServiceScope scope = scopeFactory.CreateScope())
-            {
-                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
-                qcount qc = _context.qcounts.First();
-                qc.Count = n;
-                _context.Entry(qc).State = EntityState.Modified;
-                _context.SaveChanges();
-                if (queues.Count > n)
-                if (n == 0)
-                {
-                    queues = new List<ConcurrentQueue<QueuedFunction>>();
-                    _context.QueuedFunctions.ExecuteDelete();
-                    queued = new ConcurrentDictionary<string, byte>();
-                }
-                while (queues.Count > n)
-                {
-                    ConcurrentQueue<QueuedFunction> q = Emptier();
-                    queues.Remove(q);
-                    while (q.Count > 0)
-                    {
-                        int i = queues.IndexOf(Emptier());
-                        q.TryDequeue(out QueuedFunction item);
-                        item.Queue = i;
-                        queues[i].Enqueue(item);
-                        QueuedFunction.DBItem dbi = _context.QueuedFunctions.FirstOrDefault(_=>_.Hash == item.Hash);
-                        dbi.Queue = i;
-                        _context.Entry(dbi).State = EntityState.Modified;
-                        _context.SaveChanges();
-                    }
-                }
-            }
-            if (queues.Count < n) while (queues.Count < n) queues.Add(new());
-        }
-
+        public List<CustomQueue> GetQueues() => queues;
+        public CustomQueue GetQueue(int id) => queues[id-1];
         public object getTranStatus(string id)
         {
             try 

@@ -11,7 +11,7 @@ namespace TopicosP1Backend.Cache
         }
 
         public DbSet<QueuedFunction.DBItem> QueuedFunctions { get; set; }
-        public DbSet<qcount> qcounts { get; set; }
+        public DbSet<Qcount> qcounts { get; set; }
         public DbSet<wcount> wcounts { get; set; }
     }
 

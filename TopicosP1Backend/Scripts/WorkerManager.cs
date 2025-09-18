@@ -5,7 +5,8 @@ namespace TopicosP1Backend.Scripts
     public class wcount
     {
         public long Id { get; set; }
-        required public int Count { get; set; }
+        required public int Queue { get; set; }
+        required public int TakeCount { get; set; }
     }
 
     public class WorkerManager: IHostedService
@@ -18,26 +19,61 @@ namespace TopicosP1Backend.Scripts
             _queue = queue;
             _scopeFactory = scope;
             CacheContext c = scope.CreateScope().ServiceProvider.GetService<CacheContext>();
-            wcount wc = c.wcounts.FirstOrDefault();
-            if (wc == null) { wc = new() { Count = 1 }; c.wcounts.Add(wc); c.SaveChanges(); }
-            SetCountTo(wc.Count);
+            List<wcount> wcs = c.wcounts.ToList();
+            foreach (wcount w in wcs) _workers.Add(new(_scopeFactory, _queue) { assignedqueue = w.Queue, take = w.TakeCount });
         }
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public object GetWorkers() => (from i in _workers select new { Worker = _workers.IndexOf(i), i.Status });
-        public object GetWorker(int id) => new { Worker = id, _workers[id].Status };
-        
-        public void SetCountTo(int n)
+        public object GetWorkers() => (from i in _workers select new { Id = _workers.IndexOf(i)+1, Queue = i.assignedqueue, Take = i.take, i.Status });
+        public object GetWorker(int id) => new { Id = id, Queue = _workers[id-1].assignedqueue, Take = _workers[id-1].take, _workers[id-1].Status };
+        public void SetWorkerQueue(int id, int q)
         {
-            if (n == _workers.Count) return;
-            CacheContext c = _scopeFactory.CreateScope().ServiceProvider.GetService<CacheContext>();
-            wcount wc = c.wcounts.First();
-            wc.Count = n;
-            c.Entry(wc).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            c.SaveChanges();
-            if (n > _workers.Count) while (n > _workers.Count) _workers.Add(new(_scopeFactory, _queue));
-            if (n < _workers.Count) while (n < _workers.Count) { var w = _workers.Last(); _workers.Remove(w); w.Stop(); w.Dispose(); }
+            using (IServiceScope scope = _scopeFactory.CreateScope())
+            {
+                CacheContext c = scope.ServiceProvider.GetService<CacheContext>();
+                List<wcount> wcs = c.wcounts.ToList();
+                wcount? wc = wcs.ElementAtOrDefault(id - 1);
+                if (wc != null) { wc.Queue = q; c.SaveChanges(); }
+            }
+            _workers[id - 1].assignedqueue = q;
+        }
+        public void SetWorkerTake(int id, int take)
+        {
+            using (IServiceScope scope = _scopeFactory.CreateScope())
+            {
+                CacheContext c = scope.ServiceProvider.GetService<CacheContext>();
+                List<wcount> wcs = c.wcounts.ToList();
+                wcount? wc = wcs.ElementAtOrDefault(id - 1);
+                if (wc != null) { wc.TakeCount = take; c.SaveChanges(); }
+            }
+            _workers[id - 1].take = take;
+        }
+
+        public void AddWorker(int q)
+        {
+            using (IServiceScope scope = _scopeFactory.CreateScope())
+            {
+                CacheContext c = scope.ServiceProvider.GetService<CacheContext>();
+                wcount wc = new() { Queue = q, TakeCount = 1 };
+                c.wcounts.Add(wc);
+                c.SaveChanges();
+                _workers.Add(new(_scopeFactory, _queue) { assignedqueue = q });
+            }
+        }
+
+        public void RemoveWorker(int n)
+        {
+            using (IServiceScope scope = _scopeFactory.CreateScope())
+            {
+                CacheContext c = scope.ServiceProvider.GetService<CacheContext>();
+                List<wcount> wcs = c.wcounts.ToList();
+                wcount? wc = wcs.ElementAtOrDefault(n-1);
+                if (wc != null) c.wcounts.Remove(wc);
+                c.SaveChanges();
+                _workers[n-1].Stop();
+                _workers.RemoveAt(n-1);
+            }
         }
 
         public void Stop(int n) => _workers[n].Stop();
