@@ -11,7 +11,7 @@ namespace TopicosP1Backend.Scripts
         private readonly IServiceScopeFactory scopeFactory;
         private readonly APIQueue _queue;
         public int assignedqueue = 0;
-        public int take = 10;
+        public int take = 1;
         public ConcurrentQueue<QueuedFunction> taken = [];
         public string Status = "";
         private CancellationTokenSource cts = new();

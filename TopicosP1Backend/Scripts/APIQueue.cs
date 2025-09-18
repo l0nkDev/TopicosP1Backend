@@ -64,6 +64,33 @@ namespace TopicosP1Backend.Scripts
                 queues.Add(new() { Endpoints = Endpoints });
             }
         }
+
+        public void SetEndpoints(int id, List<int> Endpoints)
+        {
+            if (Endpoints == null) Endpoints = [-1];
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                List<Qcount> qs = _context.qcounts.ToList();
+                qs[id - 1].Endpoints = Endpoints;
+                _context.Entry(qs[id - 1]).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                _context.SaveChanges();
+                queues[id - 1].Endpoints = Endpoints;
+            }
+        }
+
+        public void DeleteQueue(int id)
+        {
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
+                List<Qcount> qs = _context.qcounts.ToList();
+                _context.qcounts.Remove(qs[id - 1]);
+                _context.SaveChanges();
+                queues.Remove(queues[id - 1]);
+            }
+        }
+
         public void AddResponse(string id, object obj) 
         { 
             responses.TryAdd(id, obj);
@@ -112,7 +139,7 @@ namespace TopicosP1Backend.Scripts
             int? c = null;
             foreach (var q in queues)
                 if (c == null || q.Count < c)
-                    if (function == -1 || q.Endpoints.Contains(function))
+                    if (function == -1 || q.Endpoints.Contains(-1) || q.Endpoints.Contains(function))
                     {
                         res = q;
                         c = q.Count;
@@ -138,7 +165,6 @@ namespace TopicosP1Backend.Scripts
             string tranid = Util.Hash(hashtarget);
             QueuedFunction qf = new QueuedFunction()
             { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
-            if (qf.Queue == -1) return "No queue available for this function.";
             string dn = function.GetDisplayName();
             thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
 
@@ -150,6 +176,7 @@ namespace TopicosP1Backend.Scripts
 
             if (IsQueued(tranid) != null) return tranid;
             try { return Get(tranid, delete); } catch { }
+            if (qf.Queue == -1) return "No queue available for this function.";
             if (queues.Count == 0) return "No queues available.";
             Add(qf);
             return tranid;
