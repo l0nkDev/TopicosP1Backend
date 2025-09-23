@@ -46,18 +46,28 @@ namespace TopicosP1Backend.Scripts
                             }
                             QueuedFunction.DBItem? exiting = null;
                             if (usecache) exiting = await cache.QueuedFunctions.FirstOrDefaultAsync(_ => _.Hash == a.Hash);
-                            object res = await a.Execute(context);
                             if (exiting != null) cache.QueuedFunctions.Remove(exiting);
                             if (usecache) cache.SaveChanges();
-                            _queue.AddResponse(a.Hash, res);
-                            string dn = a.Function.GetDisplayName();
-                            _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+                            object res = null;
+                            try { res = await a.Execute(context); }
+                            catch
+                            {
+                                int i = _queue.queues.IndexOf(_queue.Emptier((int)a.Function));
+                                a.Queue = i;
+                                _queue.Add(a);
+                            }
+                            if (res != null)
+                            {
+                                _queue.AddResponse(a.Hash, res);
+                                string dn = a.Function.GetDisplayName();
+                                _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+                            }
                             await Task.Yield();
                         }
                     }
-                    else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Delay(1000, stoppingToken); }
+                    else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Yield(); }
                 }
-                scope?.Dispose(); scope = null; await Task.Delay(1000, stoppingToken);
+                scope?.Dispose(); scope = null; await Task.Yield();
             });
         }
         public async void Stop()

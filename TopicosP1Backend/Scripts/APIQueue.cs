@@ -19,7 +19,7 @@ namespace TopicosP1Backend.Scripts
     public class APIQueue
     {
         private readonly IServiceScopeFactory scopeFactory;
-        private List<CustomQueue> queues = [];
+        public List<CustomQueue> queues = [];
         private ConcurrentDictionary<string, byte> queued = [];
         private ConcurrentDictionary<string, object> responses = [];
         public ConcurrentDictionary<string, int> thingsdone = [];
@@ -39,7 +39,6 @@ namespace TopicosP1Backend.Scripts
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;
         }
-
         public void Add(QueuedFunction action)
         {
             using (IServiceScope scope = scopeFactory.CreateScope())
@@ -175,7 +174,7 @@ namespace TopicosP1Backend.Scripts
 
 
             if (IsQueued(tranid) != null) return tranid;
-            try { return Get(tranid, delete); } catch { }
+            try { return Get(tranid, delete); } catch { Console.WriteLine("FUCK"); }
             if (qf.Queue == -1) return "No queue available for this function.";
             if (queues.Count == 0) return "No queues available.";
             Add(qf);

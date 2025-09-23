@@ -26,6 +26,7 @@ namespace CareerApi.Models
         }
         public static async Task<IEnumerable<CareerDTO>> GetCareers(Context _context)
         {
+            throw new NotImplementedException();
             var careers = await _context.Careers.AsSplitQuery().ToListAsync();
             return from a in careers select a.SimpleList();
         }
