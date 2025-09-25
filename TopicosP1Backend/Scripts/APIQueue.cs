@@ -44,7 +44,8 @@ namespace TopicosP1Backend.Scripts
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
                 CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
-                _context.QueuedFunctions.Add(action.ToDBItem());
+                QueuedFunction.DBItem dbi = action.ToDBItem();
+                _context.QueuedFunctions.Add(dbi);
                 _context.SaveChanges();
                 queued.TryAdd(action.Hash, 0);
                 CustomQueue emptier = queues[action.Queue];
@@ -159,11 +160,11 @@ namespace TopicosP1Backend.Scripts
             return res;
         }
 
-        public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false)
+        public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false, string callback = "")
         {
             string tranid = Util.Hash(hashtarget);
             QueuedFunction qf = new QueuedFunction()
-            { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body };
+            { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body, Callback = callback };
             string dn = function.GetDisplayName();
             thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
 
@@ -174,7 +175,8 @@ namespace TopicosP1Backend.Scripts
 
 
             if (IsQueued(tranid) != null) return tranid;
-            try { return Get(tranid, delete); } catch { Console.WriteLine("FUCK"); }
+
+            try { return Get(tranid, delete); } catch { }
             if (qf.Queue == -1) return "No queue available for this function.";
             if (queues.Count == 0) return "No queues available.";
             Add(qf);

@@ -28,7 +28,8 @@ namespace TopicosP1Backend.Controllers
         [HttpGet]
         public object GetCareers()
         {
-            return _queue.Request(Function.GetCareers, [], "", $"GetCareers");
+            string callback = Request.Query.ContainsKey("callback") ? Request.Query["callback"] : "";
+            return _queue.Request(Function.GetCareers, [], "", $"GetCareers", false, callback: callback);
         }
 
         [HttpGet("{id}")]

@@ -60,6 +60,7 @@ namespace TopicosP1Backend.Scripts
                             {
                                 _queue.AddResponse(a.Hash, res);
                                 string dn = a.Function.GetDisplayName();
+                                if (a.Callback != "") Console.WriteLine(a.Callback);
                                 _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
                             }
                             await Task.Yield();

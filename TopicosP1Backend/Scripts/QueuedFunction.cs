@@ -32,6 +32,7 @@ namespace TopicosP1Backend.Scripts
         required public Function Function { get; set; }
         required public List<string> ItemIds { get; set; }
         required public string Body { get; set; }
+        required public string Callback { get; set; }
         public DBItem ToDBItem() => new(this);
         public class DBItem
         {
@@ -41,13 +42,15 @@ namespace TopicosP1Backend.Scripts
             public int Function { get; set; }
             public string ItemIds { get; set; }
             public string Body { get; set; }
+            public string Callback { get; set; }
             public QueuedFunction ToQueueItem() => new()
             {
                 Queue = Queue,
                 Hash = Hash,
                 Function = (Function)Function,
                 ItemIds = JsonSerializer.Deserialize<List<string>>(ItemIds),
-                Body = Body
+                Body = Body,
+                Callback = Callback
             };
 
             public DBItem(QueuedFunction qf)
@@ -57,6 +60,7 @@ namespace TopicosP1Backend.Scripts
                 Function = (int)qf.Function;
                 ItemIds = JsonSerializer.Serialize(qf.ItemIds);
                 Body = qf.Body;
+                Callback = qf.Callback;
             }
 
             [JsonConstructor]
