@@ -17,6 +17,7 @@ namespace TopicosP1Backend.Scripts
         GetModRooms, PostModRoom, DeleteModRoom,//
         GetPeriods, PostPeriod, GetPeriod, PutPeriod, DeletePeriod,//
         GetStudents, PostStudent, GetStudent, PutStudent, DeleteStudent,//
+        GetStudentGroup, PutStudentGroup,//
         GetStudentHistory, GetStudentAvaliables,//
         GetStudyPlans, PostStudyPlan, GetStudyPlan, PutStudyPlan, DeleteStudyPlan,//
         GetSpSubjects, PostSpSubject, PutSpSubject, DeleteSpSubject,//
@@ -124,6 +125,10 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetStudent: return await Student.GetStudent(context, long.Parse(ItemIds[0]));
                 case Function.PutStudent: return await Student.PutStudent(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Student.StudentPost>(Body));
                 case Function.DeleteStudent: return await Student.DeleteStudent(context, long.Parse(ItemIds[0]));
+
+                case Function.GetStudentGroup: return await Student.GetStudentGroup(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
+                case Function.PutStudentGroup: return await Student.PutStudentGroup(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]), JsonSerializer.Deserialize<StudentGroups.SgDTO>(Body));
+
                 case Function.GetStudentHistory: return await Student.History(context, long.Parse(ItemIds[0]));
                 case Function.GetStudentAvaliables: return await Student.Available(context, long.Parse(ItemIds[0]));
 

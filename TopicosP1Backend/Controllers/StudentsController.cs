@@ -58,6 +58,19 @@ namespace TopicosP1Backend.Controllers
             return _queue.Request(Function.DeleteStudent, [$"{id}"], "", $"DeleteStudent {id}");
         }
 
+        [HttpGet("{id}/Groups/{stId}")]
+        public object GetStudentGroup(long id, long stId)
+        {
+            return _queue.Request(Function.GetStudentGroup, [$"{id}", $"{stId}"], "", $"GetStudentGroup {id} {stId}");
+        }
+
+        [HttpPut("{id}/Groups/{stId}")]
+        public object PutStudentGroup(long id, long stId, StudentGroups.SgDTO stDTO)
+        {
+            string b = JsonSerializer.Serialize(stDTO);
+            return _queue.Request(Function.PutStudentGroup, [$"{id}", $"{stId}"], b, $"PutStudentGroup {id} {stId}");
+        }
+
         [HttpGet("{id}/history")]
         public object GetStudentHistory(long id)
         {

@@ -20,5 +20,14 @@ namespace CareerApi.Models
             public int Grade { get; set; } = sg.Grade;
             public int Status { get; set; } = sg.Status;
         }
+
+        public class SgDTO
+        {
+            public long Id { get; set; }
+            public string Code { get; set; }
+            public string Title { get; set; }
+            public int Grade { get; set; }
+            public int Status { get; set; }
+        }
     }
 }

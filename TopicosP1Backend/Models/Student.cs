@@ -40,7 +40,6 @@ namespace CareerApi.Models
             return student.Simple();
         }
 
-        [HttpPut("{id}")]
         public static async Task<ActionResult<StudentDTO>> PutStudent(Context _context, long id, StudentPost student)
         {
             Student s = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == id);
@@ -53,7 +52,6 @@ namespace CareerApi.Models
             return s.Simple();
         }
 
-        [HttpPost]
         public static async Task<ActionResult<StudentDTO>> PostStudent(Context _context, StudentPost student)
         {
             Student s = new() { FirstName = student.FirstName, LastName = student.LastName };
@@ -63,7 +61,6 @@ namespace CareerApi.Models
             return s.Simple();
         }
 
-        [HttpDelete("{id}")]
         public static async Task<IActionResult> DeleteStudent(Context _context, long id)
         {
             var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == id);
@@ -71,6 +68,28 @@ namespace CareerApi.Models
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
             return new NoContentResult();
+        }
+
+        public static async Task<ActionResult<StudentGroups.HistoryEntry>> GetStudentGroup(Context _context, long id, long sgId)
+        {
+            var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == id);
+            if (student == null) return new NotFoundResult();
+            var studentGroup = await _context.StudentGroups.IgnoreAutoIncludes().Include(_ => _.Group).ThenInclude(_ => _.Subject).FirstOrDefaultAsync(_ => _.Id == sgId && _.Student.Id == student.Id);
+            if (studentGroup == null) return new NotFoundResult();
+            return studentGroup.Simple();
+        }
+
+        public static async Task<ActionResult<StudentGroups.HistoryEntry>> PutStudentGroup(Context _context, long id, long sgId, StudentGroups.SgDTO sgDTO)
+        {
+            var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == id);
+            if (student == null) return new NotFoundResult();
+            var studentGroup = await _context.StudentGroups.IgnoreAutoIncludes().Include(_ => _.Group).ThenInclude(_ => _.Subject).FirstOrDefaultAsync(_ => _.Id == sgId && _.Student.Id == student.Id);
+            if (studentGroup == null) return new NotFoundResult();
+            studentGroup.Status = sgDTO.Status;
+            studentGroup.Grade = sgDTO.Grade;
+            _context.Entry(studentGroup).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return studentGroup.Simple();
         }
 
         public static async Task<ActionResult<List<StudentGroups.HistoryEntry>>> History(Context context, long id)
