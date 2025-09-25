@@ -11,8 +11,7 @@ namespace TopicosP1Backend.Scripts
         GetGestions, PostGestion, GetGestion, DeleteGestion,//
         GetGroups, PostGroup, GetGroup, PutGroup, DeleteGroup,//
         GetTimeSlots, PostTimeSlot, PutTimeSlot, DeleteTimeSlot,//
-        GetInscriptions, PostInscription, GetInscription, PutInscription, DeleteInscription,// 
-        GetInsGroups, PostInsGroup, DeleteInsGroup,//
+        GetInscriptions, PostInscription, GetInscription, DeleteInscription,//
         GetModules, PostModule, GetModule, DeleteModule,//
         GetModRooms, PostModRoom, DeleteModRoom,//
         GetPeriods, PostPeriod, GetPeriod, PutPeriod, DeletePeriod,//
@@ -99,12 +98,7 @@ namespace TopicosP1Backend.Scripts
                 case Function.GetInscriptions: return await Inscription.GetInscriptions(context);
                 case Function.PostInscription: return await Inscription.PostInscription(context, JsonSerializer.Deserialize<Inscription.InscriptionPost>(Body));
                 case Function.GetInscription: return await Inscription.GetInscription(context, long.Parse(ItemIds[0]));
-                case Function.PutInscription: return await Inscription.PutInscription(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Inscription.InscriptionPost>(Body));
                 case Function.DeleteInscription: return await Inscription.DeleteInscription(context, long.Parse(ItemIds[0]));
-
-                case Function.GetInsGroups: return await Inscription.GetInsGroups(context, long.Parse(ItemIds[0]));
-                case Function.PostInsGroup: return await Inscription.PostInsGroups(context, long.Parse(ItemIds[0]), JsonSerializer.Deserialize<Inscription.GIPost>(Body));
-                case Function.DeleteInsGroup: return await Inscription.DeleteInsGroups(context, long.Parse(ItemIds[0]), long.Parse(ItemIds[1]));
 
                 case Function.GetModules: return await Module.GetModules(context);
                 case Function.PostModule: return await Module.PostModule(context, JsonSerializer.Deserialize<Module.ModulePost>(Body));

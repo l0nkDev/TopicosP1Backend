@@ -33,8 +33,9 @@ namespace CareerApi.Models
             public long Period { get; set; }
             public long Gestion { get; set; }
             public int Type { get; set; }
-
+            public List<long> GroupIds { get; set; } = [];
         }
+
         public class GIPost
         {
             required public long Group { get; set; }
@@ -63,26 +64,32 @@ namespace CareerApi.Models
             return inscription.Simple();
         }
 
-        public static async Task<ActionResult<InscriptionDTO>> PutInscription(Context _context, long id, InscriptionPost i)
-        {
-            var inscription = await _context.Inscriptions.FindAsync(id);
-            var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == i.Student);
-            var period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == i.Period && _.Gestion.Year == i.Gestion);
-            if (inscription == null || student == null || period == null) return new NotFoundResult();
-            if (id != inscription.Id) return new BadRequestResult();
-            inscription.Student = student;
-            inscription.Period = period;
-            inscription.Type = i.Type;
-            _context.Entry(inscription).State = EntityState.Modified;
-            _context.SaveChanges();
-            return inscription.Simple();
-        }
-
         public static async Task<ActionResult<InscriptionDTO>> PostInscription(Context _context, InscriptionPost i)
         {
             var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == i.Student);
             var period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == i.Period && _.Gestion.Year == i.Gestion);
+            if (student == null || period == null) return new NotFoundResult();
             Inscription n = new() { Student = student, Period = period, DateTime = DateTime.Now, Type = i.Type };
+            foreach (var groupid in i.GroupIds)
+            {
+                Group? group = await _context.Groups.FindAsync(groupid);
+                if (group == null) return new NotFoundResult();
+                StudentGroups? sg = await _context.StudentGroups.FirstOrDefaultAsync(_ => _.Student == student && _.Group == group);
+                if (sg == null)
+                {
+                    if (i.Type != 2)
+                    {
+                        sg = new StudentGroups() { Group = group, Student = student };
+                        _context.StudentGroups.Add(sg);
+                    }
+                }
+                else
+                {
+                    if (i.Type == 2) sg.Status = 2;
+                    _context.Entry(sg).State = EntityState.Modified;
+                }
+                _context.GroupInscriptions.Add(new() { Group = group, Inscription = n });
+            }
             _context.Inscriptions.Add(n);
             await _context.SaveChangesAsync();
 
@@ -101,36 +108,6 @@ namespace CareerApi.Models
             await _context.SaveChangesAsync();
 
             return new NoContentResult();
-        }
-
-        public static async Task<ActionResult<List<Group.GroupDTO>>> GetInsGroups(Context _context, long id)
-        {
-            var inscription = await _context.Inscriptions.IgnoreAutoIncludes().Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Subject)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Teacher)
-                .Include(_ => _.Student).Include(_ => _.Period).ThenInclude(_ => _.Gestion).Include(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)
-                .FirstOrDefaultAsync(_ => _.Id == id);
-            if (inscription == null) return new NotFoundResult();
-            return inscription.Simple().Groups.ToList();
-        }
-
-        public static async Task<ActionResult<List<Group.GroupDTO>>> PostInsGroups(Context _context, long id, GIPost body)
-        {
-            var inscription = await _context.Inscriptions.FirstOrDefaultAsync(_ => _.Id == id);
-            Group group = await _context.Groups.FindAsync(body.Group);
-            if (inscription == null || group == null) return new NotFoundResult();
-            GroupInscription gi = new() { Group = group, Inscription = inscription };
-            await _context.GroupInscriptions.AddAsync(gi);
-            await _context.SaveChangesAsync();
-            return new OkResult();
-        }
-
-        public static async Task<ActionResult<List<Group.GroupDTO>>> DeleteInsGroups(Context _context, long id, long group)
-        {
-            GroupInscription gi = await _context.GroupInscriptions.FirstOrDefaultAsync(_ => _.Group.Id == group && _.Inscription.Id == id);
-            if (gi == null) return new NotFoundResult();
-            _context.GroupInscriptions.Remove(gi);
-            await _context.SaveChangesAsync();
-            return new OkResult();
         }
     }
 }
