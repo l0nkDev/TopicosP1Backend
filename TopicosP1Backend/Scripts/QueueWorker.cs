@@ -62,11 +62,12 @@ namespace TopicosP1Backend.Scripts
                                 string dn = a.Function.GetDisplayName();
                                 if (a.Callback != "") Console.WriteLine(a.Callback);
                                 _queue.thingsdone.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
+                                if (exiting != null && _queue.queues[exiting.Queue].Deleting && _queue.queues[exiting.Queue].Count <= 0) _queue.DeleteQueue(exiting.Queue+1);
                             }
                             await Task.Yield();
                         }
                     }
-                    else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Yield(); }
+                    else { scope?.Dispose(); scope = null; Status = "Idle"; /*Console.WriteLine($"Idling Worker {this.GetHashCode()}")*/; await Task.Yield(); }
                 }
                 scope?.Dispose(); scope = null; await Task.Yield();
             });

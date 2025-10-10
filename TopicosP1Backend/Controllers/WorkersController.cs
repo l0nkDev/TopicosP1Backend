@@ -5,7 +5,7 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminWorkersController(APIQueue queue, WorkerManager manager) : ControllerBase
+    public class WorkersController(APIQueue queue, WorkerManager manager) : ControllerBase
     {
         private readonly APIQueue _queue = queue;
         private readonly WorkerManager _manager = manager;

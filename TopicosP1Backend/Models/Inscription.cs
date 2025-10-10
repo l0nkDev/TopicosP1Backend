@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using TopicosP1Backend.Scripts;
@@ -64,16 +65,61 @@ namespace CareerApi.Models
             return inscription.Simple();
         }
 
-        public static async Task<ActionResult<InscriptionDTO>> PostInscription(Context _context, InscriptionPost i)
+        public static async Task<ActionResult<object>> PostInscription(Context _context, InscriptionPost i)
         {
+            List<string> errors = [];
             var student = await _context.Students.IgnoreAutoIncludes().FirstOrDefaultAsync(_ => _.Id == i.Student);
             var period = await _context.Periods.FirstOrDefaultAsync(_ => _.Number == i.Period && _.Gestion.Year == i.Gestion);
             if (student == null || period == null) return new NotFoundResult();
+            if (i.GroupIds.Count <= 0) return new BadRequestResult();
             Inscription n = new() { Student = student, Period = period, DateTime = DateTime.Now, Type = i.Type };
+            bool added = false;
             foreach (var groupid in i.GroupIds)
             {
                 Group? group = await _context.Groups.FindAsync(groupid);
-                if (group == null) return new NotFoundResult();
+                if (group == null)
+                    return new NotFoundResult();
+                if (group.Quota <= 0)
+                {
+                    errors.Add($"Grupo {group.Subject.Code}-{group.Code} ({group.Id}) no tiene cupos.");
+                    Console.WriteLine($"Grupo {group.Subject.Code}-{group.Code} ({group.Id}) no tiene cupos.");
+                    continue;
+                }
+                group.Quota--;
+                _context.Entry(group).State = EntityState.Modified;
+                bool saved = false;
+                while (!saved)
+                {
+                    try 
+                    {
+                        await _context.SaveChangesAsync();
+                        saved = true;
+                        Console.WriteLine($"Grupo {group.Subject.Code}-{group.Code} ({group.Id}) inscrito. Quedan {group.Quota} cupos.");
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        foreach (var entry in ex.Entries)
+                            if (entry.Entity is Group)
+                            {
+                                var dbValues = await entry.GetDatabaseValuesAsync();
+                                entry.OriginalValues.SetValues(dbValues);
+                                entry.CurrentValues.SetValues(dbValues);
+                            }
+                        if (group.Quota <= 0)
+                        {
+                            Console.WriteLine($"Grupo {group.Subject.Code}-{group.Code} ({group.Id}) no tiene cupos.");
+                            errors.Add($"Grupo {group.Subject.Code}-{group.Code} ({group.Id}) no tiene cupos.");
+                            continue;
+                        }
+                        group.Quota--;
+                        _context.Entry(group).State = EntityState.Modified;
+                    }
+                }
+                if (!saved) continue;
+                if (!added) _context.Inscriptions.Add(n);
+                added = true;
+                GroupInscription ngi = new() { Group = group, Inscription = n };
+                _context.GroupInscriptions.Add(ngi);
                 StudentGroups? sg = await _context.StudentGroups.FirstOrDefaultAsync(_ => _.Student == student && _.Group == group);
                 if (sg == null)
                 {
@@ -88,12 +134,9 @@ namespace CareerApi.Models
                     if (i.Type == 2) sg.Status = 2;
                     _context.Entry(sg).State = EntityState.Modified;
                 }
-                _context.GroupInscriptions.Add(new() { Group = group, Inscription = n });
             }
-            _context.Inscriptions.Add(n);
             await _context.SaveChangesAsync();
-
-            return n.Simple();
+            return new { Errors = errors, Result = n.Simple() };
         }
 
         public static async Task<IActionResult> DeleteInscription(Context _context, long id)

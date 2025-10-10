@@ -1,6 +1,8 @@
-﻿using TopicosP1Backend.Cache;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi.Extensions;
 using System.Collections.Concurrent;
+using TopicosP1Backend.Cache;
 
 namespace TopicosP1Backend.Scripts
 {
@@ -10,11 +12,13 @@ namespace TopicosP1Backend.Scripts
         public long Id { get; set; }
 
         public List<int> Endpoints { get; set; } = [-1];
+        public bool Deleting { get; set; }
     }
 
     public class CustomQueue: ConcurrentQueue<QueuedFunction>
     {
         public List<int> Endpoints { get; set; } = [-1];
+        public bool Deleting { get; set; }
     }
     public class APIQueue
     {
@@ -34,7 +38,7 @@ namespace TopicosP1Backend.Scripts
             IServiceScope? scope = scopeFactory.CreateScope();
             CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
             List<Qcount> qcs = cache.qcounts.ToList();
-            foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints });
+            foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints, Deleting=qc.Deleting });
             List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;
@@ -59,9 +63,9 @@ namespace TopicosP1Backend.Scripts
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
                 CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
-                _context.qcounts.Add(new() { Endpoints = Endpoints});
+                _context.qcounts.Add(new() { Endpoints = Endpoints, Deleting = false });
                 _context.SaveChanges();
-                queues.Add(new() { Endpoints = Endpoints });
+                queues.Add(new() { Endpoints = Endpoints, Deleting = false });
             }
         }
 
@@ -81,10 +85,16 @@ namespace TopicosP1Backend.Scripts
 
         public void DeleteQueue(int id)
         {
+            queues[id-1].Deleting = true;
             using (IServiceScope scope = scopeFactory.CreateScope())
             {
                 CacheContext _context = scope.ServiceProvider.GetService<CacheContext>();
                 List<Qcount> qs = _context.qcounts.ToList();
+                Qcount qc = qs[id - 1];
+                qc.Deleting = true;
+                _context.Entry(qc).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                _context.SaveChanges();
+                if (queues[id - 1].Count > 0) return;
                 _context.qcounts.Remove(qs[id - 1]);
                 _context.SaveChanges();
                 queues.Remove(queues[id - 1]);
@@ -139,7 +149,7 @@ namespace TopicosP1Backend.Scripts
             int? c = null;
             foreach (var q in queues)
                 if (c == null || q.Count < c)
-                    if (function == -1 || q.Endpoints.Contains(-1) || q.Endpoints.Contains(function))
+                    if ((function == -1 || q.Endpoints.Contains(-1) || q.Endpoints.Contains(function)) && !q.Deleting)
                     {
                         res = q;
                         c = q.Count;
@@ -174,13 +184,18 @@ namespace TopicosP1Backend.Scripts
                     return qf.Execute(scope.ServiceProvider.GetService<Context>());
 
 
-            if (IsQueued(tranid) != null) return tranid;
+            if (IsQueued(tranid) != null) return new { Status = "PENDING", Token = tranid };
 
-            try { return Get(tranid, delete); } catch { }
-            if (qf.Queue == -1) return "No queue available for this function.";
-            if (queues.Count == 0) return "No queues available.";
+            try 
+            {
+                object r = getTranStatus(tranid);
+                Get(tranid, delete);
+                return r;
+            } catch { }
+            if (qf.Queue == -1) return new { Status = "ERROR", Result = "No queue available for this function."};
+            if (queues.Count == 0) return new { Status = "ERROR", Result = "No queues available." };
             Add(qf);
-            return tranid;
+            return new { Status = "PENDING", Token = tranid }; ;
         }
 
         public List<CustomQueue> GetQueues() => queues;
@@ -190,17 +205,16 @@ namespace TopicosP1Backend.Scripts
             try 
             {
                 dynamic r = responses[id];
-                object value = r.Value;
-                if (value != null) return new { Status = "Done", Result = value };
-                int status = r.Result.StatusCode;
-                switch (status)
+                int? statusCode = GetStatusCode(r);
+                if (statusCode == 200) return new { Status = "ACCEPTED", Result = r.Value };
+                switch (statusCode)
                 {
-                    case 404: return new { Status = "Done", Result = "404 Not Found" };
-                    case 400: return new { Status = "Done", Result = "400 Bad Request" };
+                    case 404: return new { Status = "REJECTED", Result = "404 Not Found" };
+                    case 400: return new { Status = "REJECTED", Result = "400 Bad Request" };
+                    case 500: return new { Status = "REJECTED", Result = "500 Internal server error" };
                 }
-                return new { Status = "Done", Result = r };
+                return new { Status = "REJECTED", Result = $"{statusCode} Unknown error" };
             } catch { }
-            try { return new { Status = "Done", Result = responses[id] }; } catch { }
             bool isInQueue = false;
             QueuedFunction? tmp = null;
             foreach (var q in queues)
@@ -212,9 +226,16 @@ namespace TopicosP1Backend.Scripts
                     break;
                 }
             }
-            if (isInQueue && tmp != null) return new { Status = "Queued", Item = tmp};
-            if (queued.ContainsKey(id)) return new { Status = "Processing...", Item = "Out of Queue. Item is in a function and its information will be unavailable until it finishes processing." };
-            return new { Status = "Not found", Item = "Item is not queued and no result has been saved. ID may be wrong or the result may have already expired." };
+            if (isInQueue && tmp != null) return new { Status = "PENDING", Item = "Transaction is being queued."};
+            if (queued.ContainsKey(id)) return new { Status = "PENDING", Item = "Transaction is being processed." };
+            return new { Status = "NONEXISTANT", Item = "Transaction doesn't exist or it has already been retrieved." };
+        }
+
+        private static int? GetStatusCode(ActionResult<object> actionResult)
+        {
+            IConvertToActionResult convertToActionResult = (IConvertToActionResult)actionResult.Value; // ActionResult implicit implements IConvertToActionResult
+            var actionResultWithStatusCode = convertToActionResult.Convert() as IStatusCodeActionResult;
+            return actionResultWithStatusCode?.StatusCode;
         }
     }
 }

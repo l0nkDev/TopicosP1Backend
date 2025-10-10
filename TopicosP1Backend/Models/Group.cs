@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using TopicosP1Backend.Scripts;
 
@@ -13,12 +14,14 @@ namespace CareerApi.Models
         required public Period Period { get; set; }
         required public Subject Subject { get; set; }
         required public Teacher Teacher { get; set; }
+        [ConcurrencyCheck]
         public long Quota { get; set; }
         public IEnumerable<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
         public IEnumerable<GroupInscription> GroupInscriptions { get; set; } = new List<GroupInscription>();
         public IEnumerable<Inscription> Inscriptions { get; set; } = new List<Inscription>();
         public IEnumerable<StudentGroups> StudentGroups { get; set; } = new List<StudentGroups>();
         public IEnumerable<Student> Students { get; set; } = new List<Student>();
+
         public GroupDTO Simple() => new(this);
 
         public class GroupDTO(Group group)

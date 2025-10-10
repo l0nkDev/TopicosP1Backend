@@ -8,7 +8,7 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminQueuesController(APIQueue queue, WorkerManager manager) : ControllerBase
+    public class QueuesController(APIQueue queue, WorkerManager manager) : ControllerBase
     {
         private readonly APIQueue _queue = queue;
         private readonly WorkerManager _manager = manager;
@@ -26,6 +26,7 @@ namespace TopicosP1Backend.Controllers
                 tmp.Add("Count", queues[i].Count);
                 if (queues[i].Endpoints.Contains(-1)) tmp.Add("Endpoints", "Any");
                 else tmp.Add("Endpoints", from q in queues[i].Endpoints select ((Function)q).GetDisplayName());
+                tmp.Add("Deleting", queues[i].Deleting);
                 tmp.Add("Items", from q in queues[i] select new { q.Hash, Function = q.Function.GetDisplayName(), q.ItemIds, q.Body } );
                 res.Add(tmp);
                 i++;
@@ -42,6 +43,7 @@ namespace TopicosP1Backend.Controllers
             tmp.Add("Count", queue.Count);
             if (queue.Endpoints.Contains(-1)) tmp.Add("Endpoints", "Any");
             else tmp.Add("Endpoints", from q in queue.Endpoints select ((Function)q).GetDisplayName());
+            tmp.Add("Deleting", queue.Deleting);
             tmp.Add("Items", from q in queue select new { q.Hash, Function = q.Function.GetDisplayName(), q.ItemIds, q.Body });
             return tmp;
 

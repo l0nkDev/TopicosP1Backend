@@ -2,8 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using TopicosP1Backend.Scripts;
 using TopicosP1Backend.Cache;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                      });
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -12,10 +23,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Context>(opt =>
-//    opt.UseNpgsql("Username=postgres; Password=\\^MGbat%=5deeuN; Host=34.55.58.2; Database=topicos;"));
+    opt.UseNpgsql("Username=postgres; Password=\\^MGbat%=5deeuN; Host=34.55.58.2; Database=topicos;"));
 //    opt.UseNpgsql("Username=postgres; Password=postgres; Host=localhost; Database=topicos;"));
 //    opt.UseInMemoryDatabase("main"));
-    opt.UseSqlite("Data Source=main.db"));
+//    opt.UseSqlite("Data Source=main.db"));
 builder.Services.AddDbContext<CacheContext>(opt =>
     opt.UseSqlite("Data Source=cache.db"));
 builder.Services.AddSingleton<APIQueue>();
@@ -32,6 +43,8 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

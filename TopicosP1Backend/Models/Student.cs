@@ -11,6 +11,7 @@ namespace CareerApi.Models
         public long Id { get; set; }
         required public string FirstName { get; set; }
         required public string LastName { get; set; }
+        public bool Blocked { get; set; } = false;
         public IEnumerable<StudyPlan> StudyPlans { get; set; } = new List<StudyPlan>();
         public IEnumerable<StudentGroups> StudentGroups { get; set; } = new List<StudentGroups>();
         public IEnumerable<Group> Groups { get; set; } = new List<Group>();
@@ -20,12 +21,14 @@ namespace CareerApi.Models
             public long Id { get; set; } = s.Id;
             public string FirstName { get; set; } = s.FirstName;
             public string LastName { get; set; } = s.LastName;
+            public bool Blocked { get; set; } = s.Blocked;
         }
         public class StudentPost
         {
             required public long Id { get; set; }
             required public string FirstName { get; set; }
             required public string LastName { get; set; }
+            required public bool Blocked { get; set; }
         }
         public static async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents(Context _context)
         {
@@ -47,6 +50,7 @@ namespace CareerApi.Models
             if (s.Id != student.Id) return new BadRequestResult();
             s.FirstName = student.FirstName;
             s.LastName = student.LastName;
+            s.Blocked = student.Blocked;
             _context.Entry(s).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return s.Simple();
@@ -113,6 +117,7 @@ namespace CareerApi.Models
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Teacher)
                 .FirstOrDefaultAsync(_ => _.Id == id);
             if (student == null) { return new NotFoundResult(); }
+            if (student.Blocked) { return new ObjectResult(new { Error = "El estudiante está bloqueado." }); }
             var spsubjects = (from sp in student.StudyPlans select sp.SpSubjects).SelectMany(_ => _).ToList();
             var passed = (from sub in student.StudentGroups where sub.Grade >= 51 && sub.Status == 1 select sub.Group.Subject).ToList();
             List<Subject> available = new List<Subject>();
