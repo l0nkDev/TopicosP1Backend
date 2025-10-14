@@ -39,6 +39,7 @@ namespace TopicosP1Backend.Scripts
             CacheContext cache = scope.ServiceProvider.GetService<CacheContext>();
             List<Qcount> qcs = cache.qcounts.ToList();
             foreach (Qcount qc in qcs) queues.Add(new() { Endpoints = qc.Endpoints, Deleting=qc.Deleting });
+            if (queues.Count == 0) AddQueue([-1]);
             List<QueuedFunction.DBItem> saved = cache.QueuedFunctions.ToList();
             foreach (QueuedFunction.DBItem item in saved) queues[item.Queue].Enqueue(item.ToQueueItem());
             scope?.Dispose(); scope = null; cache = null;

@@ -21,6 +21,7 @@ namespace TopicosP1Backend.Scripts
             CacheContext c = scope.CreateScope().ServiceProvider.GetService<CacheContext>();
             List<wcount> wcs = c.wcounts.ToList();
             foreach (wcount w in wcs) _workers.Add(new(_scopeFactory, _queue) { assignedqueue = w.Queue, take = w.TakeCount });
+            if (_workers.Count == 0) AddWorker(1);
         }
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

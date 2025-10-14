@@ -24,15 +24,16 @@ namespace CareerApi.Models
 
         public GroupDTO Simple() => new(this);
 
-        public class GroupDTO(Group group)
+        public class GroupDTO(Group groupi)
         {
-            public long Id { get; set; } = group.Id;
-            public Subject.SubjectSimple Subject { get; set; } = group.Subject.Simple();
-            public string Code { get; set; } = group.Code;
-            public string Mode { get; set; } = group.Mode;
-            public long Quota { get; set; } = group.Quota;
-            public Period.PeriodDTO Period { get; set; } = group.Period.Simple();
-            public Teacher.TeacherDTO Teacher { get; set; } = group.Teacher.Simple();
+            public long Id { get; set; } = groupi.Id;
+            public Subject.SubjectSimple Subject { get; set; } = groupi.Subject.Simple();
+            public string Code { get; set; } = groupi.Code;
+            public string Mode { get; set; } = groupi.Mode;
+            public long Quota { get; set; } = groupi.Quota;
+            public Period.PeriodDTO Period { get; set; } = groupi.Period.Simple();
+            public Teacher.TeacherDTO Teacher { get; set; } = groupi.Teacher.Simple();
+            public List<TimeSlot.TimeSlotDTO> Timeslots { get; set; } = (from g in (groupi.TimeSlots) select g.Simple()).ToList();
         }
         public class GroupPost
         {

@@ -67,7 +67,7 @@ namespace TopicosP1Backend.Scripts
                             await Task.Yield();
                         }
                     }
-                    else { scope?.Dispose(); scope = null; Status = "Idle"; /*Console.WriteLine($"Idling Worker {this.GetHashCode()}")*/; await Task.Yield(); }
+                    else { scope?.Dispose(); scope = null; Status = "Idle"; Console.WriteLine($"Idling Worker {this.GetHashCode()}"); await Task.Delay(0); }
                 }
                 scope?.Dispose(); scope = null; await Task.Yield();
             });

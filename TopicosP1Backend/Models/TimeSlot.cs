@@ -16,7 +16,6 @@
             public string Day { get; set; } = ts.Day;
             public TimeOnly StartTime { get; set; } = ts.StartTime;
             public TimeOnly EndTime { get; set; } = ts.EndTime;
-            public Room.RoomDTO Room { get; set; } = ts.Room.Simple();
         }
 
         public class TimeSlotPost

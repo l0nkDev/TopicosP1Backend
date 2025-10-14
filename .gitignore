@@ -365,3 +365,5 @@ FodyWeavers.xsd
 *.db-shm
 *.db-shm
 *.db-wal
+/TopicosP1Backend/published
+*.db

@@ -28,7 +28,8 @@ builder.Services.AddDbContext<Context>(opt =>
 //    opt.UseInMemoryDatabase("main"));
 //    opt.UseSqlite("Data Source=main.db"));
 builder.Services.AddDbContext<CacheContext>(opt =>
-    opt.UseSqlite("Data Source=cache.db"));
+//    opt.UseSqlite("Data Source=cache.db"));
+    opt.UseInMemoryDatabase("cache"));
 builder.Services.AddSingleton<APIQueue>();
 builder.Services.AddSingleton<WorkerManager>();
 builder.Services.AddHostedService(_ => _.GetRequiredService<WorkerManager>());

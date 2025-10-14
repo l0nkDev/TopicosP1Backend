@@ -115,6 +115,7 @@ namespace CareerApi.Models
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Prerequisites)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Period).ThenInclude(_ => _.Gestion)
                 .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.Teacher)
+                .Include(_ => _.StudyPlans).ThenInclude(_ => _.SpSubjects).ThenInclude(_ => _.Subject).ThenInclude(_ => _.Groups).ThenInclude(_ => _.TimeSlots).ThenInclude(_ => _.Room).ThenInclude(_ => _.Module)
                 .FirstOrDefaultAsync(_ => _.Id == id);
             if (student == null) { return new NotFoundResult(); }
             if (student.Blocked) { return new ObjectResult(new { Error = "El estudiante está bloqueado." }); }

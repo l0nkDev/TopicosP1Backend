@@ -644,6 +644,8 @@ namespace TopicosP1Backend.Scripts
                 new() { FirstName = "Braulio", LastName = "Caceres"},
                 new() { FirstName = "Elizabeth", LastName = "Oropeza"},
                 new() { FirstName = "", LastName = "Siles"},
+                new() { FirstName = "Miguel", LastName = "Peinado"},
+                new() { FirstName = "Shirley", LastName = "Perez"},
             };
             context.Teachers.AddRange(teachers);
 
@@ -683,8 +685,8 @@ namespace TopicosP1Backend.Scripts
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[43], Teacher = teachers[0]},
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[45], Teacher = teachers[0]},
                 new() { Code = "SA", Mode = "Presencial", Period = periods[40], Subject = subjects[50], Teacher = teachers[0]},
-                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[0], Quota = 20},
-                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[74], Teacher = teachers[0], Quota = 120},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[7], Quota = 20},
+                new() { Code = "SA", Mode = "Presencial", Period = periods[41], Subject = subjects[74], Teacher = teachers[6], Quota = 80},
                 new() { Code = "SC", Mode = "Presencial", Period = periods[41], Subject = subjects[53], Teacher = teachers[0]},
                 new() { Code = "SB", Mode = "Presencial", Period = periods[41], Subject = subjects[46], Teacher = teachers[0]},
                 new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[3], Teacher = teachers[1]},
@@ -692,6 +694,7 @@ namespace TopicosP1Backend.Scripts
                 new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[1], Teacher = teachers[3]},
                 new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[4], Teacher = teachers[4]},
                 new() { Code = "Z2", Mode = "Presencial", Period = periods[16], Subject = subjects[0], Teacher = teachers[5]},
+                new() { Code = "SB", Mode = "Presencial", Period = periods[41], Subject = subjects[78], Teacher = teachers[7], Quota = 20},
             };
             context.Groups.AddRange(groups);
 
@@ -715,6 +718,8 @@ namespace TopicosP1Backend.Scripts
                 new() { Day = "Thursday", StartTime = new(16,00), EndTime = new(17,30), Room = rooms[12], Group = groups[6]},
                 new() { Day = "Tuesday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[17], Group = groups[7]},
                 new() { Day = "Thursday", StartTime = new(18,15), EndTime = new(20,30), Room = rooms[25], Group = groups[7]},
+                new() { Day = "Tuesday", StartTime = new(17,30), EndTime = new(19,00), Room = rooms[17], Group = groups[15]},
+                new() { Day = "Thursday", StartTime = new(17,30), EndTime = new(19,00), Room = rooms[25], Group = groups[15]},
                 new() { Day = "Monday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Group = groups[8]},
                 new() { Day = "Wednesday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Group = groups[8]},
                 new() { Day = "Friday", StartTime = new(18,15), EndTime = new(19,45), Room = rooms[11], Group = groups[8]},
