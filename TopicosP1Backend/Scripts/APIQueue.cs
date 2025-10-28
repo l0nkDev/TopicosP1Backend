@@ -171,11 +171,12 @@ namespace TopicosP1Backend.Scripts
             return res;
         }
 
-        public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false, string callback = "")
+        public object Request(Function function, List<string> itemIds, string body, string hashtarget, bool delete = false, string callback = "", string ip = "0.0.0.0")
         {
-            string tranid = Util.Hash(hashtarget);
+            string tranid = Util.Hash($"{hashtarget} {ip}");
+            Console.WriteLine($"\n{ip} requested the function: {hashtarget}; tranId:{tranid}");
             QueuedFunction qf = new QueuedFunction()
-            { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body, Callback = callback };
+            { Queue = queues.IndexOf(Emptier((int)function)), Function = function, ItemIds = itemIds, Hash = tranid, Body = body, Callback = callback, IP = ip };
             string dn = function.GetDisplayName();
             thingsreceived.AddOrUpdate(dn, 1, (key, oldValue) => oldValue + 1);
 
@@ -208,13 +209,8 @@ namespace TopicosP1Backend.Scripts
                 dynamic r = responses[id];
                 int? statusCode = GetStatusCode(r);
                 if (statusCode == 200) return new { Status = "ACCEPTED", Result = r.Value };
-                switch (statusCode)
-                {
-                    case 404: return new { Status = "REJECTED", Result = "404 Not Found" };
-                    case 400: return new { Status = "REJECTED", Result = "400 Bad Request" };
-                    case 500: return new { Status = "REJECTED", Result = "500 Internal server error" };
-                }
-                return new { Status = "REJECTED", Result = $"{statusCode} Unknown error" };
+                Console.WriteLine(r);
+                return new { Status = "REJECTED", Result = GetWrappedObject(r) };
             } catch { }
             bool isInQueue = false;
             QueuedFunction? tmp = null;
@@ -237,6 +233,13 @@ namespace TopicosP1Backend.Scripts
             IConvertToActionResult convertToActionResult = (IConvertToActionResult)actionResult.Value; // ActionResult implicit implements IConvertToActionResult
             var actionResultWithStatusCode = convertToActionResult.Convert() as IStatusCodeActionResult;
             return actionResultWithStatusCode?.StatusCode;
+        }
+
+        private static object GetWrappedObject(ActionResult<object> actionResult)
+        {
+            IConvertToActionResult convertToActionResult = (IConvertToActionResult)actionResult.Value; // ActionResult implicit implements IConvertToActionResult
+            var actionResultWithStatusCode = convertToActionResult.Convert();
+            return actionResultWithStatusCode;
         }
     }
 }

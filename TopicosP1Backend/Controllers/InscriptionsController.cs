@@ -7,40 +7,44 @@ namespace TopicosP1Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InscriptionsController : ControllerBase
+    public class InscriptionsController(APIQueue queue) : ControllerBase
     {
-        private readonly Context _context;
-        private readonly APIQueue _queue;
+        private readonly APIQueue _queue = queue;
 
-        public InscriptionsController(Context context, APIQueue queue)
+        [HttpGet("status/{tranid}")]
+        public object GetInscriptionState(string tranid)
         {
-            _context = context;
-            _queue = queue;
+            return _queue.getTranStatus(tranid);
         }
 
         [HttpGet]
         public object GetInscriptions()
         {
-            return _queue.Request(Function.GetInscriptions, [], "", "GetInscriptions", true);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknownhost";
+            if (ipAddress.StartsWith("::ffff:10.52.12")) return new OkResult();
+            return _queue.Request(Function.GetInscriptions, [], "", "GetInscriptions", true, ip: ipAddress);
         }
 
         [HttpGet("{id}")]
         public object GetInscription(long id)
         {
-            return _queue.Request(Function.GetInscription, [$"{id}"], "", $"GetInscription {id}", true);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
+            return _queue.Request(Function.GetInscription, [$"{id}"], "", $"GetInscription {id}", true, ip: ipAddress);
         }
 
         [HttpPost]
         public object PostInscription(Inscription.InscriptionPost i)
         {
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
             string b = JsonSerializer.Serialize(i);
-            return _queue.Request(Function.PostInscription, [], b, $"PostInscription {b}");
+            return _queue.Request(Function.PostInscription, [], b, $"PostInscription {b}", ip: ipAddress);
         }
 
         [HttpDelete("{id}")]
         public object DeleteInscription(long id)
         {
-            return _queue.Request(Function.DeleteInscription, [$"{id}"], "", $"DeleteInscription {id}");
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
+            return _queue.Request(Function.DeleteInscription, [$"{id}"], "", $"DeleteInscription {id}", ip: ipAddress);
         }
     }
 }
